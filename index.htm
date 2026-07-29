@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameVault - Ultimate PC Gaming & Torrent Portal</title> 
     
-    <!-- PWA Manifest Integration -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdhbWVWYXVsdCBQb3J0YWwiLAogICJzaG9ydF9uYW1lIjogIkdhbWVWYXVsdCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDUwN22IiwKICAidGhlbWVfY29sb3IiOiAiIzAwZjBmZiIKfQ==">
     <meta name="theme-color" content="#00f0ff">
 
     <!-- Firebase SDKs (Compat Version) -->
@@ -125,7 +123,6 @@
             margin: 1.2rem 0;
             color: #8b949e;
             font-size: 0.8rem;
-            position: relative;
         }
 
         .btn-google {
@@ -233,7 +230,6 @@
             padding: 0 1.5rem;
         }
 
-        /* Hero & Search */
         .hero {
             text-align: center;
             margin-bottom: 3rem;
@@ -273,7 +269,6 @@
             box-shadow: 0 0 25px var(--neon-cyan);
         }
 
-        /* Spec Checker Box */
         .checker-box {
             background: rgba(112, 0, 255, 0.1);
             border: 1px dashed var(--neon-purple);
@@ -297,7 +292,6 @@
             outline: none;
         }
 
-        /* Category Tabs */
         .tabs {
             display: flex;
             gap: 0.8rem;
@@ -324,7 +318,6 @@
             border-color: var(--neon-green);
         }
 
-        /* Game Cards Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -485,7 +478,6 @@
             color: #fff;
         }
 
-        /* Live Requests Grid */
         .live-requests {
             margin-top: 3rem;
             background: rgba(13, 17, 23, 0.6);
@@ -507,7 +499,6 @@
             font-weight: bold;
         }
 
-        /* Request Form Section */
         .request-section {
             background: var(--card-bg);
             border: 1px solid var(--neon-purple);
@@ -539,7 +530,6 @@
             box-shadow: 0 0 12px var(--neon-purple);
         }
 
-        /* Custom Neon Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -628,7 +618,7 @@
             <h2 id="authTitle">GAMEVAULT</h2>
             <p class="sub" id="authSub">Sign in to access PC games portal</p>
             
-            <form class="auth-form" onsubmit="handleAuthSubmit(event)">
+            <form class="auth-form" id="mainAuthForm">
                 <input type="email" id="authEmail" placeholder="Email Address" required>
                 <input type="password" id="authPassword" placeholder="Password (min 6 chars)" required>
                 <button type="submit" class="btn-auth" id="authSubmitBtn">Login to Vault</button>
@@ -636,19 +626,19 @@
 
             <div class="auth-divider">OR</div>
 
-            <button class="btn-google" onclick="handleGoogleSignIn()">
+            <button class="btn-google" id="googleAuthBtn">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.26v3.15C3.25 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.26C.46 8.23 0 10.06 0 12s.46 3.77 1.26 5.39l4.02-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.26 6.61l4.02 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/></svg>
                 Sign in with Google
             </button>
 
             <div class="toggle-auth">
                 <span id="toggleText">Don't have an account?</span> 
-                <a href="javascript:void(0)" onclick="toggleAuthMode()" id="toggleLink">Sign Up</a>
+                <a href="javascript:void(0)" id="toggleAuthBtn">Sign Up</a>
             </div>
         </div>
     </div>
 
-    <!-- 2. MAIN GAMEVAULT APP (Hidden until user logs in) -->
+    <!-- 2. MAIN GAMEVAULT APP -->
     <div id="mainApp" class="hidden">
         <header>
             <div class="logo">GAME<span>VAULT</span></div>
@@ -658,7 +648,7 @@
                 <a href="#requestForm">Request Game</a>
                 <a href="javascript:void(0)" onclick="openAdminModal()" style="color: var(--neon-pink);">+ Admin Add</a>
                 <span class="user-badge" id="userEmailBadge">User</span>
-                <button class="btn-logout" onclick="handleLogout()">Log Out</button>
+                <button class="btn-logout" id="logoutBtn">Log Out</button>
             </nav>
         </header>
 
@@ -736,87 +726,86 @@
     </div>
 
     <script>
-        // 1. Firebase Configuration (Apne Firebase Console se URL set rakhein)
-        const firebaseConfig = {
-            databaseURL: "https://ultragamers-3e651-default-rtdb.firebaseio.com"
-        };
-        firebase.initializeApp(firebaseConfig);
-        
-        const database = firebase.database();
-        const auth = firebase.auth();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
-
+        // Global variables declare
         let isSignUpMode = false;
         let currentActiveCategory = 'all';
         const ADMIN_SECRET_PIN = "1720"; 
 
-        // 2. Authentication Logic
-        function toggleAuthMode() {
-            isSignUpMode = !isSignUpMode;
-            const title = document.getElementById('authTitle');
-            const sub = document.getElementById('authSub');
-            const btn = document.getElementById('authSubmitBtn');
-            const toggleText = document.getElementById('toggleText');
-            const toggleLink = document.getElementById('toggleLink');
+        // AAPKI EXACT LIVE FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1cm52NV37GiLi5uPNVmxuSUzanyCWhYs",
+            authDomain: "ultragamers-3e651.firebaseapp.com",
+            databaseURL: "https://ultragamers-3e651-default-rtdb.firebaseio.com",
+            projectId: "ultragamers-3e651",
+            storageBucket: "ultragamers-3e651.firebasestorage.app",
+            messagingSenderId: "896382431646",
+            appId: "1:896382431646:web:c4cc6f0da8cd9e160f668f",
+            measurementId: "G-6E7BCW39JD"
+        };
 
-            if (isSignUpMode) {
-                title.innerText = "CREATE ACCOUNT";
-                sub.innerText = "Join GameVault community today";
-                btn.innerText = "Register Account";
-                toggleText.innerText = "Already have an account?";
-                toggleLink.innerText = "Login";
-            } else {
-                title.innerText = "GAMEVAULT";
-                sub.innerText = "Sign in to access PC games portal";
-                btn.innerText = "Login to Vault";
-                toggleText.innerText = "Don't have an account?";
-                toggleLink.innerText = "Sign Up";
-            }
-        }
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-        function handleAuthSubmit(event) {
-            event.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggleAuthBtn');
+            const mainAuthForm = document.getElementById('mainAuthForm');
+            const googleAuthBtn = document.getElementById('googleAuthBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
 
-            if (isSignUpMode) {
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then(() => alert("Account Created Successfully!"))
-                    .catch(err => alert("Error: " + err.message));
-            } else {
-                auth.signInWithEmailAndPassword(email, password)
-                    .catch(err => alert("Error: " + err.message));
-            }
-        }
+            toggleBtn.addEventListener('click', () => {
+                isSignUpMode = !isSignUpMode;
+                document.getElementById('authTitle').innerText = isSignUpMode ? "CREATE ACCOUNT" : "GAMEVAULT";
+                document.getElementById('authSub').innerText = isSignUpMode ? "Join GameVault community today" : "Sign in to access PC games portal";
+                document.getElementById('authSubmitBtn').innerText = isSignUpMode ? "Register Account" : "Login to Vault";
+                document.getElementById('toggleText').innerText = isSignUpMode ? "Already have an account?" : "Don't have an account?";
+                toggleBtn.innerText = isSignUpMode ? "Login" : "Sign Up";
+            });
 
-        function handleGoogleSignIn() {
-            auth.signInWithPopup(googleProvider)
-                .catch(err => alert("Google Auth Error: " + err.message));
-        }
+            mainAuthForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('authEmail').value;
+                const password = document.getElementById('authPassword').value;
 
-        function handleLogout() {
-            auth.signOut().then(() => alert("Logged Out Successfully!"));
-        }
+                if (isSignUpMode) {
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then(() => openModal("Success", "Account Ban Gaya Hai! Login karrhein."))
+                        .catch(err => openModal("Error", err.message));
+                } else {
+                    auth.signInWithEmailAndPassword(email, password)
+                        .catch(err => openModal("Login Error", err.message));
+                }
+            });
 
-        // 3. Auth State Observer (Screen Control)
-        auth.onAuthStateChanged((user) => {
-            const authScreen = document.getElementById('authScreen');
-            const mainApp = document.getElementById('mainApp');
-            const userBadge = document.getElementById('userEmailBadge');
+            googleAuthBtn.addEventListener('click', () => {
+                auth.signInWithPopup(googleProvider)
+                    .catch(err => openModal("Google Auth Error", err.message));
+            });
 
-            if (user) {
-                authScreen.classList.add('hidden');
-                mainApp.classList.remove('hidden');
-                userBadge.innerText = user.email ? user.email.split('@')[0] : "Gamer";
-                loadGamesFromFirebase();
-                loadLiveRequests();
-            } else {
-                authScreen.classList.remove('hidden');
-                mainApp.classList.add('hidden');
-            }
+            logoutBtn.addEventListener('click', () => {
+                auth.signOut().then(() => openModal("Logged Out", "Aap successfully logout ho gaye hain."));
+            });
+
+            auth.onAuthStateChanged((user) => {
+                const authScreen = document.getElementById('authScreen');
+                const mainApp = document.getElementById('mainApp');
+                const userBadge = document.getElementById('userEmailBadge');
+
+                if (user) {
+                    authScreen.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    userBadge.innerText = user.email ? user.email.split('@')[0] : "Gamer";
+                    loadGamesFromFirebase();
+                    loadLiveRequests();
+                } else {
+                    authScreen.classList.remove('hidden');
+                    mainApp.classList.add('hidden');
+                }
+            });
         });
 
-        // 4. Default Games Data
+        // Default Games Data
         const defaultGames = [
             {
                 id: "tekken8",
@@ -862,7 +851,6 @@
             }
         ];
 
-        // 5. Load Games Live from Database
         const gamesRef = database.ref('vault_games');
 
         function loadGamesFromFirebase() {
@@ -1028,7 +1016,6 @@
             applyFilters();
         }
 
-        // Admin Modal (Add & Edit Support)
         function openAdminModal(editKey = null) {
             const userPass = prompt("🔐 Enter Secret Admin PIN:");
             if (userPass !== ADMIN_SECRET_PIN) {
