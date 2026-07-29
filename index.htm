@@ -731,7 +731,7 @@
         let currentActiveCategory = 'all';
         const ADMIN_SECRET_PIN = "1720"; 
 
-        // AAPKI EXACT LIVE FIREBASE CONFIGURATION
+        // LIVE FIREBASE CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyD1cm52NV37GiLi5uPNVmxuSUzanyCWhYs",
             authDomain: "ultragamers-3e651.firebaseapp.com",
@@ -770,7 +770,7 @@
 
                 if (isSignUpMode) {
                     auth.createUserWithEmailAndPassword(email, password)
-                        .then(() => openModal("Success", "Account Ban Gaya Hai! Login karrhein."))
+                        .then(() => openModal("Account Created!", "Your account has been successfully created. Please log in."))
                         .catch(err => openModal("Error", err.message));
                 } else {
                     auth.signInWithEmailAndPassword(email, password)
@@ -784,7 +784,7 @@
             });
 
             logoutBtn.addEventListener('click', () => {
-                auth.signOut().then(() => openModal("Logged Out", "Aap successfully logout ho gaye hain."));
+                auth.signOut().then(() => openModal("Logged Out", "You have been successfully logged out."));
             });
 
             auth.onAuthStateChanged((user) => {
@@ -961,7 +961,7 @@
             document.getElementById('reqGame').value = '';
             document.getElementById('reqNote').value = '';
 
-            openModal('Request Submitted!', `Aap ki request (${game}) Firebase Database par save ho chuki hai!`);
+            openModal('Request Submitted!', `Your request for (${game}) has been saved live to the database!`);
         }
 
         function checkCompatibility() {
@@ -1066,7 +1066,7 @@
             const specs = document.getElementById('admSpecs').value;
 
             if(!title || !magnet) {
-                alert('Title aur Magnet URL mandatory hain!');
+                alert('Title and Magnet URL are required!');
                 return;
             }
 
@@ -1087,7 +1087,7 @@
             });
 
             closeModal();
-            openModal('Success', 'Game Firebase Database mein successfully update ho chuki hai!');
+            openModal('Success', 'Game has been successfully updated in the Firebase Database!');
         }
 
         function deleteGame(key) {
@@ -1097,9 +1097,9 @@
                 return;
             }
 
-            if(confirm("Kya aap waqai is game ko delete karna chahte hain?")) {
+            if(confirm("Are you sure you want to delete this game?")) {
                 gamesRef.child(key).remove();
-                openModal('Deleted', 'Game record Database se delete kar diya gaya hai.');
+                openModal('Deleted', 'Game record has been deleted from the Database.');
             }
         }
 
