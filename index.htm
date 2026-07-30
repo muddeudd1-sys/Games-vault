@@ -49,115 +49,6 @@
             display: none !important;
         }
 
-        /* Authentication Screen Styles */
-        #authScreen {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
-        }
-
-        .auth-card {
-            background: var(--card-bg);
-            border: 1px solid var(--neon-cyan);
-            border-radius: 16px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }
-
-        .auth-card h2 {
-            color: #fff;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .auth-card p.sub {
-            color: #8b949e;
-            font-size: 0.9rem;
-            margin-bottom: 1.8rem;
-        }
-
-        .auth-form input {
-            width: 100%;
-            padding: 0.85rem 1rem;
-            margin-bottom: 1rem;
-            background: rgba(5, 7, 10, 0.9);
-            border: 1px solid var(--border-dim);
-            color: #fff;
-            border-radius: 8px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .auth-form input:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 12px var(--neon-cyan);
-        }
-
-        .btn-auth {
-            width: 100%;
-            padding: 0.85rem;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-        }
-
-        .btn-auth:hover {
-            box-shadow: 0 0 25px var(--neon-cyan);
-            transform: translateY(-2px);
-        }
-
-        .auth-divider {
-            margin: 1.2rem 0;
-            color: #8b949e;
-            font-size: 0.8rem;
-        }
-
-        .btn-google {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.3s;
-        }
-
-        .btn-google:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: #fff;
-        }
-
-        .toggle-auth {
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
-            color: #8b949e;
-        }
-
-        .toggle-auth a {
-            color: var(--neon-green);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
         /* Header Navigation */
         header {
             background: rgba(8, 10, 15, 0.9);
@@ -222,6 +113,18 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 0.8rem;
+        }
+
+        .btn-login-nav {
+            background: var(--neon-cyan);
+            color: #000;
+            border: none;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
 
         .container {
@@ -530,6 +433,7 @@
             box-shadow: 0 0 12px var(--neon-purple);
         }
 
+        /* Modal Overlays */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -551,6 +455,7 @@
             max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 0 35px rgba(0, 240, 255, 0.4);
+            position: relative;
         }
 
         .modal-header {
@@ -601,6 +506,100 @@
             float: right;
         }
 
+        /* Auth Card in Modal */
+        .auth-card {
+            background: transparent;
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            color: #fff;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .auth-card p.sub {
+            color: #8b949e;
+            font-size: 0.9rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1rem;
+            background: rgba(5, 7, 10, 0.9);
+            border: 1px solid var(--border-dim);
+            color: #fff;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .auth-form input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 12px var(--neon-cyan);
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-auth:hover {
+            box-shadow: 0 0 25px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        .auth-divider {
+            margin: 1.2rem 0;
+            color: #8b949e;
+            font-size: 0.8rem;
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-google:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #fff;
+        }
+
+        .toggle-auth {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        .toggle-auth a {
+            color: var(--neon-green);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
         footer {
             text-align: center;
             padding: 2.5rem;
@@ -612,111 +611,86 @@
 </head>
 <body>
 
-    <!-- 1. USER AUTHENTICATION SCREEN -->
-    <div id="authScreen">
-        <div class="auth-card">
-            <h2 id="authTitle">GAMEVAULT</h2>
-            <p class="sub" id="authSub">Sign in to access PC games portal</p>
+    <!-- MAIN APP WEBSITE HEADER -->
+    <header>
+        <div class="logo">GAME<span>VAULT</span></div>
+        <nav>
+            <a href="#gamesGrid">Vault Games</a>
+            <a href="#liveRequests">Live Feed</a>
+            <a href="#requestForm">Request Game</a>
+            <a href="javascript:void(0)" onclick="openAdminModal()" style="color: var(--neon-pink);">+ Admin Add</a>
             
-            <form class="auth-form" id="mainAuthForm">
-                <input type="email" id="authEmail" placeholder="Email Address" required>
-                <input type="password" id="authPassword" placeholder="Password (min 6 chars)" required>
-                <button type="submit" class="btn-auth" id="authSubmitBtn">Login to Vault</button>
+            <span class="user-badge hidden" id="userEmailBadge">User</span>
+            <button class="btn-logout hidden" id="logoutBtn">Log Out</button>
+            <button class="btn-login-nav" id="loginNavBtn" onclick="openAuthModal('Please login to continue.')">Log In / Sign Up</button>
+        </nav>
+    </header>
+
+    <!-- WEBSITE CONTENT -->
+    <div class="container">
+        <section class="hero">
+            <h1>GAMEVAULT CENTRAL</h1>
+            <p>Direct Magnet Links, PC Titles, Fighting Classics & Community Requests</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search titles (e.g. Tekken 8, KOF, GTA, Cyberpunk)...">
+            </div>
+        </section>
+
+        <!-- Spec Checker -->
+        <div class="checker-box">
+            <span>⚡ <strong>Can I Run It? Checker:</strong></span>
+            <select id="userRam">
+                <option value="4">4 GB RAM</option>
+                <option value="8" selected>8 GB RAM</option>
+                <option value="16">16 GB+ RAM</option>
+            </select>
+            <select id="userGpu">
+                <option value="low">Intel HD / Low GPU</option>
+                <option value="mid" selected>Mid-Range (GTX 1050/1060)</option>
+                <option value="high">High-End (RTX / RX Series)</option>
+            </select>
+            <button onclick="checkCompatibility()" class="btn-info">Check Games</button>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('all', event)">All Games</button>
+            <button class="tab-btn" onclick="switchTab('fighting', event)">Fighting Games</button>
+            <button class="tab-btn" onclick="switchTab('action', event)">Action / Open World</button>
+            <button class="tab-btn" onclick="switchTab('classic', event)">Classics & Arcade</button>
+        </div>
+
+        <!-- Dynamic Games Grid -->
+        <div class="grid" id="gamesGrid">
+            <p style="text-align: center; color: var(--neon-cyan); grid-column: 1/-1;">Loading Vault Games from Database...</p>
+        </div>
+
+        <!-- Live Requests Feed -->
+        <div class="live-requests" id="liveRequests">
+            <h3 style="color: var(--neon-cyan); margin-bottom: 1rem;">🔥 Recent Community Requests</h3>
+            <div id="requestsFeedList">
+                <p style="color: #8b949e;">Fetching live community requests...</p>
+            </div>
+        </div>
+
+        <!-- Game Request Section -->
+        <div class="request-section" id="requestForm">
+            <h2>Request a Game / Report Dead Link</h2>
+            <p style="margin-bottom: 1.5rem; color: #8b949e;">Can't find a game? Submit your request below. It saves live to GameVault database!</p>
+            <form class="request-form" onsubmit="handleRequestSubmit(event)">
+                <input type="text" id="reqName" placeholder="Your Gamer Tag / Name" required>
+                <input type="text" id="reqGame" placeholder="Game Name (e.g. Mortal Kombat 1, Street Fighter 6)" required>
+                <textarea id="reqNote" rows="3" placeholder="Additional details (e.g. prefer specific repack or version)..."></textarea>
+                <button type="submit" class="btn btn-magnet" style="width: 100%; border-radius: 8px;">Submit Game Request</button>
             </form>
-
-            <div class="auth-divider">OR</div>
-
-            <button class="btn-google" id="googleAuthBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.26v3.15C3.25 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.26C.46 8.23 0 10.06 0 12s.46 3.77 1.26 5.39l4.02-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.26 6.61l4.02 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/></svg>
-                Sign in with Google
-            </button>
-
-            <div class="toggle-auth">
-                <span id="toggleText">Don't have an account?</span> 
-                <a href="javascript:void(0)" id="toggleAuthBtn">Sign Up</a>
-            </div>
         </div>
     </div>
 
-    <!-- 2. MAIN GAMEVAULT APP -->
-    <div id="mainApp" class="hidden">
-        <header>
-            <div class="logo">GAME<span>VAULT</span></div>
-            <nav>
-                <a href="#gamesGrid">Vault Games</a>
-                <a href="#liveRequests">Live Feed</a>
-                <a href="#requestForm">Request Game</a>
-                <a href="javascript:void(0)" onclick="openAdminModal()" style="color: var(--neon-pink);">+ Admin Add</a>
-                <span class="user-badge" id="userEmailBadge">User</span>
-                <button class="btn-logout" id="logoutBtn">Log Out</button>
-            </nav>
-        </header>
+    <footer>
+        <p>&copy; 2026 GameVault Portal - Created for Gamers</p>
+    </footer>
 
-        <div class="container">
-            <section class="hero">
-                <h1>GAMEVAULT CENTRAL</h1>
-                <p>Direct Magnet Links, PC Titles, Fighting Classics & Community Requests</p>
-                <div class="search-box">
-                    <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search titles (e.g. Tekken 8, KOF, GTA, Cyberpunk)...">
-                </div>
-            </section>
-
-            <!-- Spec Checker -->
-            <div class="checker-box">
-                <span>⚡ <strong>Can I Run It? Checker:</strong></span>
-                <select id="userRam">
-                    <option value="4">4 GB RAM</option>
-                    <option value="8" selected>8 GB RAM</option>
-                    <option value="16">16 GB+ RAM</option>
-                </select>
-                <select id="userGpu">
-                    <option value="low">Intel HD / Low GPU</option>
-                    <option value="mid" selected>Mid-Range (GTX 1050/1060)</option>
-                    <option value="high">High-End (RTX / RX Series)</option>
-                </select>
-                <button onclick="checkCompatibility()" class="btn-info">Check Games</button>
-            </div>
-
-            <!-- Category Tabs -->
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('all', event)">All Games</button>
-                <button class="tab-btn" onclick="switchTab('fighting', event)">Fighting Games</button>
-                <button class="tab-btn" onclick="switchTab('action', event)">Action / Open World</button>
-                <button class="tab-btn" onclick="switchTab('classic', event)">Classics & Arcade</button>
-            </div>
-
-            <!-- Dynamic Games Grid -->
-            <div class="grid" id="gamesGrid">
-                <p style="text-align: center; color: var(--neon-cyan); grid-column: 1/-1;">Loading Vault Games from Database...</p>
-            </div>
-
-            <!-- Live Requests Feed -->
-            <div class="live-requests" id="liveRequests">
-                <h3 style="color: var(--neon-cyan); margin-bottom: 1rem;">🔥 Recent Community Requests</h3>
-                <div id="requestsFeedList">
-                    <p style="color: #8b949e;">Fetching live community requests...</p>
-                </div>
-            </div>
-
-            <!-- Game Request Section -->
-            <div class="request-section" id="requestForm">
-                <h2>Request a Game / Report Dead Link</h2>
-                <p style="margin-bottom: 1.5rem; color: #8b949e;">Can't find a game? Submit your request below. It saves live to GameVault database!</p>
-                <form class="request-form" onsubmit="handleRequestSubmit(event)">
-                    <input type="text" id="reqName" placeholder="Your Gamer Tag / Name" required>
-                    <input type="text" id="reqGame" placeholder="Game Name (e.g. Mortal Kombat 1, Street Fighter 6)" required>
-                    <textarea id="reqNote" rows="3" placeholder="Additional details (e.g. prefer specific repack or version)..."></textarea>
-                    <button type="submit" class="btn btn-magnet" style="width: 100%; border-radius: 8px;">Submit Game Request</button>
-                </form>
-            </div>
-        </div>
-
-        <footer>
-            <p>&copy; 2026 GameVault Portal - Created for Gamers</p>
-        </footer>
-    </div>
-
-    <!-- Custom Neon Modal -->
+    <!-- INFO / MEDIA / TRAILER MODAL -->
     <div class="modal-overlay" id="customModal">
         <div class="modal-content">
             <div class="modal-header" id="modalTitle">Info</div>
@@ -725,10 +699,40 @@
         </div>
     </div>
 
+    <!-- SIGN IN / SIGN UP AUTHENTICATION MODAL -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="auth-card">
+                <h2 id="authTitle">GAMEVAULT</h2>
+                <p class="sub" id="authSub">Sign in to download games & request titles</p>
+                
+                <form class="auth-form" id="mainAuthForm">
+                    <input type="email" id="authEmail" placeholder="Email Address" required>
+                    <input type="password" id="authPassword" placeholder="Password (min 6 chars)" required>
+                    <button type="submit" class="btn-auth" id="authSubmitBtn">Login to Vault</button>
+                </form>
+
+                <div class="auth-divider">OR</div>
+
+                <button class="btn-google" id="googleAuthBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.26v3.15C3.25 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.26C.46 8.23 0 10.06 0 12s.46 3.77 1.26 5.39l4.02-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.26 6.61l4.02 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/></svg>
+                    Sign in with Google
+                </button>
+
+                <div class="toggle-auth">
+                    <span id="toggleText">Don't have an account?</span> 
+                    <a href="javascript:void(0)" id="toggleAuthBtn">Sign Up</a>
+                </div>
+            </div>
+            <button class="close-btn" style="margin-top: 15px; width: 100%;" onclick="closeAuthModal()">Close</button>
+        </div>
+    </div>
+
     <script>
-        // Global variables declare
         let isSignUpMode = false;
         let currentActiveCategory = 'all';
+        let pendingMagnetAction = null; 
+        let currentUser = null;
         const ADMIN_SECRET_PIN = "1720"; 
 
         // LIVE FIREBASE CONFIGURATION
@@ -754,10 +758,14 @@
             const googleAuthBtn = document.getElementById('googleAuthBtn');
             const logoutBtn = document.getElementById('logoutBtn');
 
+            // Load Data immediately for guest users
+            loadGamesFromFirebase();
+            loadLiveRequests();
+
             toggleBtn.addEventListener('click', () => {
                 isSignUpMode = !isSignUpMode;
                 document.getElementById('authTitle').innerText = isSignUpMode ? "CREATE ACCOUNT" : "GAMEVAULT";
-                document.getElementById('authSub').innerText = isSignUpMode ? "Join GameVault community today" : "Sign in to access PC games portal";
+                document.getElementById('authSub').innerText = isSignUpMode ? "Join GameVault community today" : "Sign in to download games & request titles";
                 document.getElementById('authSubmitBtn').innerText = isSignUpMode ? "Register Account" : "Login to Vault";
                 document.getElementById('toggleText').innerText = isSignUpMode ? "Already have an account?" : "Don't have an account?";
                 toggleBtn.innerText = isSignUpMode ? "Login" : "Sign Up";
@@ -770,16 +778,21 @@
 
                 if (isSignUpMode) {
                     auth.createUserWithEmailAndPassword(email, password)
-                        .then(() => openModal("Account Created!", "Your account has been successfully created. Please log in."))
+                        .then(() => {
+                            closeAuthModal();
+                            openModal("Account Created!", "Your account has been created and you are now logged in.");
+                        })
                         .catch(err => openModal("Error", err.message));
                 } else {
                     auth.signInWithEmailAndPassword(email, password)
+                        .then(() => closeAuthModal())
                         .catch(err => openModal("Login Error", err.message));
                 }
             });
 
             googleAuthBtn.addEventListener('click', () => {
                 auth.signInWithPopup(googleProvider)
+                    .then(() => closeAuthModal())
                     .catch(err => openModal("Google Auth Error", err.message));
             });
 
@@ -788,19 +801,25 @@
             });
 
             auth.onAuthStateChanged((user) => {
-                const authScreen = document.getElementById('authScreen');
-                const mainApp = document.getElementById('mainApp');
+                currentUser = user;
                 const userBadge = document.getElementById('userEmailBadge');
+                const logoutBtn = document.getElementById('logoutBtn');
+                const loginNavBtn = document.getElementById('loginNavBtn');
 
                 if (user) {
-                    authScreen.classList.add('hidden');
-                    mainApp.classList.remove('hidden');
+                    userBadge.classList.remove('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    loginNavBtn.classList.add('hidden');
                     userBadge.innerText = user.email ? user.email.split('@')[0] : "Gamer";
-                    loadGamesFromFirebase();
-                    loadLiveRequests();
+
+                    if (pendingMagnetAction) {
+                        downloadGame(pendingMagnetAction.key, pendingMagnetAction.magnet);
+                        pendingMagnetAction = null;
+                    }
                 } else {
-                    authScreen.classList.remove('hidden');
-                    mainApp.classList.add('hidden');
+                    userBadge.classList.add('hidden');
+                    logoutBtn.classList.add('hidden');
+                    loginNavBtn.classList.remove('hidden');
                 }
             });
         });
@@ -906,6 +925,12 @@
         }
 
         function downloadGame(key, magnet) {
+            if (!currentUser) {
+                pendingMagnetAction = { key: key, magnet: magnet };
+                openAuthModal("Please Login or Create an Account to Download Magnet Links.");
+                return;
+            }
+
             database.ref(`vault_games/${key}/downloads`).transaction((curr) => (curr || 0) + 1);
             window.location.href = magnet;
         }
@@ -946,6 +971,12 @@
 
         function handleRequestSubmit(event) {
             event.preventDefault();
+
+            if (!currentUser) {
+                openAuthModal("Please Login or Create an Account to Submit Game Requests.");
+                return;
+            }
+
             let name = document.getElementById('reqName').value;
             let game = document.getElementById('reqGame').value;
             let note = document.getElementById('reqNote').value;
@@ -1118,11 +1149,20 @@
             document.getElementById('customModal').style.display = 'none';
         }
 
+        function openAuthModal(subMsg = "Sign in to download games & request titles") {
+            document.getElementById('authSub').innerText = subMsg;
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
         window.onclick = function(event) {
             let modal = document.getElementById('customModal');
-            if (event.target == modal) {
-                closeModal();
-            }
+            let authModal = document.getElementById('authModal');
+            if (event.target == modal) closeModal();
+            if (event.target == authModal) closeAuthModal();
         }
     </script>
 </body>
