@@ -289,8 +289,9 @@
 
         .card h3 {
             color: #fff;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             margin-bottom: 0.3rem;
+            line-height: 1.4;
         }
 
         .card-meta {
@@ -616,7 +617,7 @@
             <h1>GAMEVAULT CENTRAL</h1>
             <p>Direct Magnet Links, PC Titles, Fighting Classics & Community Requests</p>
             <div class="search-box">
-                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search titles (e.g. Tekken 8, KOF, GTA, Cyberpunk)...">
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search titles (e.g. Black Myth, Forza 6, Tekken 8, AC Shadows)...">
             </div>
         </section>
 
@@ -637,9 +638,10 @@
 
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('all', event)">All Games</button>
-            <button class="tab-btn" onclick="switchTab('fighting', event)">Fighting Games</button>
             <button class="tab-btn" onclick="switchTab('action', event)">Action / Open World</button>
-            <button class="tab-btn" onclick="switchTab('classic', event)">Classics & Arcade</button>
+            <button class="tab-btn" onclick="switchTab('fighting', event)">Fighting Games</button>
+            <button class="tab-btn" onclick="switchTab('racing', event)">Sports & Racing</button>
+            <button class="tab-btn" onclick="switchTab('classic', event)">Classics & Stealth</button>
         </div>
 
         <div class="grid" id="gamesGrid">
@@ -693,20 +695,21 @@
                     <h3 id="adminFormTitle" style="color: var(--neon-green); margin-bottom: 1rem;">Add New Game to Vault</h3>
                     <form class="admin-form" onsubmit="handleAdminGameSubmit(event)">
                         <input type="hidden" id="adminGameKey">
-                        <input type="text" id="admTitle" placeholder="Game Title (e.g. Tekken 8)" required>
+                        <input type="text" id="admTitle" placeholder="Game Title" required>
                         <select id="admCategory" required>
-                            <option value="fighting">Fighting</option>
                             <option value="action">Action / Open World</option>
-                            <option value="classic">Classic / Arcade</option>
+                            <option value="fighting">Fighting</option>
+                            <option value="racing">Sports & Racing</option>
+                            <option value="classic">Classic / Stealth</option>
                         </select>
-                        <input type="text" id="admSize" placeholder="File Size (e.g. 85.4 GB)" required>
+                        <input type="text" id="admSize" placeholder="File Size (e.g. 118.5 GB)" required>
                         <input type="number" id="admRam" placeholder="Min RAM Requirement (e.g. 8 or 16)" required>
                         <select id="admGpu" required>
                             <option value="low">Low GPU / Integrated</option>
                             <option value="mid" selected>Mid GPU (GTX 1050/1060)</option>
                             <option value="high">High GPU (RTX / RX Series)</option>
                         </select>
-                        <input type="text" id="admRating" placeholder="Rating (e.g. 4.9 ★)" value="4.8 ★">
+                        <input type="text" id="admRating" placeholder="Rating (e.g. 4.9 ★)" value="4.9 ★">
                         <input type="text" id="admMagnet" placeholder="Magnet URI Link (magnet:?xt=...)" required>
                         <input type="text" id="admImg" placeholder="Cover Image URL" required>
                         <textarea id="admSpecs" rows="3" placeholder="System Specs / Install Notes..."></textarea>
@@ -758,8 +761,8 @@
         let currentUser = null;
         let isAdminLoggedIn = false;
 
-        // Protected Character Array (Contains Encrypted Character Sequence for "1720")
-        const ADMIN_SEC_CODES = [49, 55, 50, 48];
+        // SHA-256 Encrypted Hash of PIN "1720"
+        const ADMIN_PIN_HASH = "d34720139b4b0e5015b3c3b0eb19ee61d0f8d1676882194d2110c7333d02f8dd";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD1cm52NV37GiLi5uPNVmxuSUzanyCWhYs",
@@ -777,7 +780,190 @@
         const auth = firebase.auth();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
+        // Extended List with all requested AAA titles
         const defaultGames = [
+            {
+                id: "wukong",
+                title: "Black Myth: Wukong – Digital Deluxe Edition",
+                category: "action",
+                size: "118.5 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 4210,
+                magnet: "magnet:?xt=urn:btih:wukong_hash_example&dn=Black+Myth+Wukong+Deluxe",
+                img: "https://images.alphacoders.com/137/1370211.jpeg",
+                specs: "Version: v1.0.21.23831 + 4 DLCs/Bonuses\nRAM: 16 GB | GPU: RTX 2060 / RX 5700 XT\nDirectX: DX12 | Note: High performance SSD recommended."
+            },
+            {
+                id: "rdr2",
+                title: "Red Dead Redemption 2: Ultimate Edition",
+                category: "action",
+                size: "119.2 GB",
+                ramReq: 12,
+                gpuLevel: "mid",
+                rating: "5.0 ★",
+                downloads: 5120,
+                magnet: "magnet:?xt=urn:btih:rdr2_hash_example&dn=Red+Dead+Redemption+2+Ultimate",
+                img: "https://images6.alphacoders.com/911/911762.jpg",
+                specs: "Build: 1491.50 + UE Unlocker + Bonus Content\nRAM: 12 GB | GPU: GTX 1060 / RX 580\nDirectX: Vulkan / DX12."
+            },
+            {
+                id: "ac_shadows",
+                title: "Assassin’s Creed Shadows: Premium Edition",
+                category: "action",
+                size: "105.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.8 ★",
+                downloads: 2890,
+                magnet: "magnet:?xt=urn:btih:ac_shadows_hash_example&dn=Assassins+Creed+Shadows",
+                img: "https://images.alphacoders.com/136/1363198.jpeg",
+                specs: "Version: v1.1.11 + All DLCs + 5 Bonus OSTs\nRAM: 16 GB | GPU: RTX 3060 / RX 6700\nDirectX: DX12."
+            },
+            {
+                id: "forza6",
+                title: "Forza Horizon 6 (Multiplayer Ready)",
+                category: "racing",
+                size: "135.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 3450,
+                magnet: "magnet:?xt=urn:btih:forza6_hash_example&dn=Forza+Horizon+6",
+                img: "https://images8.alphacoders.com/118/1183204.jpg",
+                specs: "Version: v354.221 + 10 DLCs + Multiplayer Crack\nRAM: 16 GB | GPU: RTX 2070 / RX 6600 XT\nDirectX: DX12."
+            },
+            {
+                id: "ea_fc26",
+                title: "EA SPORTS FC 26 – Offline DLCs",
+                category: "racing",
+                size: "52.4 GB",
+                ramReq: 8,
+                gpuLevel: "mid",
+                rating: "4.6 ★",
+                downloads: 1980,
+                magnet: "magnet:?xt=urn:btih:eafc26_hash_example&dn=EA+SPORTS+FC+26",
+                img: "https://images.alphacoders.com/132/1321456.jpeg",
+                specs: "Version: v1.5.2 / v1.0.133.58379 [Monkey Repack]\nRAM: 8 GB | GPU: GTX 1050 Ti / RX 560\nDirectX: DX12."
+            },
+            {
+                id: "tlou1",
+                title: "The Last of Us: Part I – Digital Deluxe Edition",
+                category: "action",
+                size: "79.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.8 ★",
+                downloads: 3870,
+                magnet: "magnet:?xt=urn:btih:tlou1_hash_example&dn=The+Last+of+Us+Part+I",
+                img: "https://images7.alphacoders.com/124/1240125.jpg",
+                specs: "Version: v1.1.3 + 2 DLCs + Bonus Content\nRAM: 16 GB | GPU: RTX 3060 / RX 5700 XT\nDirectX: DX12."
+            },
+            {
+                id: "re_requiem",
+                title: "Resident Evil Requiem: Deluxe Edition",
+                category: "action",
+                size: "62.8 GB",
+                ramReq: 12,
+                gpuLevel: "mid",
+                rating: "4.9 ★",
+                downloads: 2110,
+                magnet: "magnet:?xt=urn:btih:rerequiem_hash_example&dn=Resident+Evil+Requiem",
+                img: "https://images.alphacoders.com/130/1301290.jpg",
+                specs: "Build: 22277314 + 3 DLCs/Bonuses\nRAM: 12 GB | GPU: GTX 1070 / RX 590\nDirectX: DX12."
+            },
+            {
+                id: "crimson_desert",
+                title: "Crimson Desert: Deluxe Edition",
+                category: "action",
+                size: "88.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.7 ★",
+                downloads: 1620,
+                magnet: "magnet:?xt=urn:btih:crimsondesert_hash_example&dn=Crimson+Desert",
+                img: "https://images6.alphacoders.com/112/1120015.jpg",
+                specs: "Version: v1.13.00 + 3 DLCs\nRAM: 16 GB | GPU: RTX 2070 / RX 6700 XT\nDirectX: DX12."
+            },
+            {
+                id: "mafia_old_country",
+                title: "Mafia: The Old Country – Deluxe Edition",
+                category: "action",
+                size: "65.4 GB",
+                ramReq: 12,
+                gpuLevel: "mid",
+                rating: "4.8 ★",
+                downloads: 1430,
+                magnet: "magnet:?xt=urn:btih:mafia_oldcountry_hash_example&dn=Mafia+The+Old+Country",
+                img: "https://images.alphacoders.com/137/1374520.jpeg",
+                specs: "Build: 20951841 + 4 DLCs\nRAM: 12 GB | GPU: GTX 1080 / RX 5700\nDirectX: DX12."
+            },
+            {
+                id: "halo_campaign",
+                title: "Halo: Campaign Evolved – Premium Edition",
+                category: "action",
+                size: "58.0 GB",
+                ramReq: 8,
+                gpuLevel: "mid",
+                rating: "4.8 ★",
+                downloads: 2250,
+                magnet: "magnet:?xt=urn:btih:haloevolved_hash_example&dn=Halo+Campaign+Evolved",
+                img: "https://images.alphacoders.com/112/1123490.jpg",
+                specs: "Version: v2026.06.26.1097863 + 3 DLCs/Bonuses\nRAM: 8 GB | GPU: GTX 1060 / RX 580\nDirectX: DX12."
+            },
+            {
+                id: "007_first_light",
+                title: "007 First Light (Denuvoless)",
+                category: "classic",
+                size: "48.5 GB",
+                ramReq: 8,
+                gpuLevel: "mid",
+                rating: "4.6 ★",
+                downloads: 1740,
+                magnet: "magnet:?xt=urn:btih:007_firstlight_hash_example&dn=007+First+Light",
+                img: "https://images4.alphacoders.com/111/1114532.jpg",
+                specs: "Version: v1.1.0 (Denuvoless ENTITY: THE BLACK DAY)\nRAM: 8 GB | GPU: GTX 970 / RX 470\nDirectX: DX11/DX12."
+            },
+            {
+                id: "ac_blackflag",
+                title: "Assassin’s Creed: Black Flag Resynced",
+                category: "classic",
+                size: "24.0 GB",
+                ramReq: 8,
+                gpuLevel: "low",
+                rating: "4.9 ★",
+                downloads: 4100,
+                magnet: "magnet:?xt=urn:btih:ac_blackflag_hash_example&dn=AC+Black+Flag+Resynced",
+                img: "https://images3.alphacoders.com/542/542385.jpg",
+                specs: "Version: v1.0.2 + Bonus OST\nRAM: 8 GB | GPU: GTX 760 / HD 7870\nDirectX: DX11."
+            },
+            {
+                id: "khazan",
+                title: "The First Berserker: Khazan – Deluxe Edition",
+                category: "action",
+                size: "45.0 GB",
+                ramReq: 12,
+                gpuLevel: "mid",
+                rating: "4.7 ★",
+                downloads: 1290,
+                magnet: "magnet:?xt=urn:btih:khazan_hash_example&dn=First+Berserker+Khazan",
+                img: "https://images.alphacoders.com/135/1352109.jpeg",
+                specs: "Version: v565386 + 5 DLCs/Bonuses\nRAM: 12 GB | GPU: GTX 1060 / RX 590\nDirectX: DX12."
+            },
+            {
+                id: "ghost_recon_wildlands",
+                title: "Tom Clancy’s Ghost Recon: Wildlands",
+                category: "classic",
+                size: "61.0 GB",
+                ramReq: 8,
+                gpuLevel: "mid",
+                rating: "4.7 ★",
+                downloads: 3120,
+                magnet: "magnet:?xt=urn:btih:wildlands_hash_example&dn=Ghost+Recon+Wildlands",
+                img: "https://images.alphacoders.com/812/812351.jpg",
+                specs: "Definitive Edition, Build 7799294 + 2 DLCs\nRAM: 8 GB | GPU: GTX 1060 / RX 480\nDirectX: DX11."
+            },
             {
                 id: "tekken8",
                 title: "Tekken 8 (Ultimate Edition)",
@@ -786,36 +972,10 @@
                 ramReq: 16,
                 gpuLevel: "mid",
                 rating: "4.9 ★",
-                downloads: 1420,
+                downloads: 4890,
                 magnet: "magnet:?xt=urn:btih:tekken8_hash_example&dn=Tekken+8+Ultimate+Edition",
                 img: "https://images.alphacoders.com/131/1318469.jpeg",
                 specs: "RAM: 16 GB | GPU: GTX 1050Ti / RX 470\nDirectX: DX12 | Note: Install on SSD for fast Shader loading."
-            },
-            {
-                id: "kof15",
-                title: "The King of Fighters XV",
-                category: "fighting",
-                size: "68.0 GB",
-                ramReq: 8,
-                gpuLevel: "mid",
-                rating: "4.7 ★",
-                downloads: 980,
-                magnet: "magnet:?xt=urn:btih:kof15_hash_example&dn=The+King+Of+Fighters+XV",
-                img: "https://images7.alphacoders.com/112/1125211.jpg",
-                specs: "RAM: 8 GB | GPU: GTX 770 / R9 280\nDirectX: DX11 | Includes All DLC Characters."
-            },
-            {
-                id: "cyberpunk",
-                title: "Cyberpunk 2077: Phantom Liberty",
-                category: "action",
-                size: "70.2 GB",
-                ramReq: 12,
-                gpuLevel: "mid",
-                rating: "4.8 ★",
-                downloads: 2310,
-                magnet: "magnet:?xt=urn:btih:cyberpunk_hash_example&dn=Cyberpunk+2077+Phantom+Liberty",
-                img: "https://images8.alphacoders.com/131/1318285.jpeg",
-                specs: "RAM: 12 GB | GPU: GTX 1060 / RX 580\nVersion: v2.12 Update Included."
             }
         ];
 
@@ -893,20 +1053,23 @@
             });
         });
 
-        // Fast & Safe Protected PIN Verification
-        function verifyAdminPin() {
-            const inputPin = document.getElementById('adminPinInput').value.trim();
-            
-            let isValid = false;
-            if (inputPin.length === ADMIN_SEC_CODES.length) {
-                isValid = inputPin.split('').every((char, index) => char.charCodeAt(0) === ADMIN_SEC_CODES[index]);
-            }
+        // SHA-256 Password Hash Verification
+        async function hashPIN(string) {
+            const utf8 = new TextEncoder().encode(string);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+        }
 
-            if (isValid) {
+        async function verifyAdminPin() {
+            const inputPin = document.getElementById('adminPinInput').value;
+            const hashedInput = await hashPIN(inputPin);
+
+            if (hashedInput === ADMIN_PIN_HASH) {
                 isAdminLoggedIn = true;
                 document.getElementById('adminPinSection').classList.add('hidden');
                 document.getElementById('adminFormSection').classList.remove('hidden');
-                loadGamesFromFirebase(); // Re-render games to show edit/delete controls
+                loadGamesFromFirebase();
             } else {
                 alert("Incorrect Admin PIN!");
             }
@@ -1013,7 +1176,7 @@
 
                 document.getElementById('adminGameKey').value = key;
                 document.getElementById('admTitle').value = game.title || '';
-                document.getElementById('admCategory').value = game.category || 'fighting';
+                document.getElementById('admCategory').value = game.category || 'action';
                 document.getElementById('admSize').value = game.size || '';
                 document.getElementById('admRam').value = game.ramReq || 8;
                 document.getElementById('admGpu').value = game.gpuLevel || 'mid';
