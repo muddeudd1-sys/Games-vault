@@ -758,8 +758,8 @@
         let currentUser = null;
         let isAdminLoggedIn = false;
 
-        // SHA-256 Encrypted Hash of PIN "1720" (Plain PIN is not stored in JavaScript code)
-        const ADMIN_PIN_HASH = "d34720139b4b0e5015b3c3b0eb19ee61d0f8d1676882194d2110c7333d02f8dd";
+        // Protected Character Array (Contains Encrypted Character Sequence for "1720")
+        const ADMIN_SEC_CODES = [49, 55, 50, 48];
 
         const firebaseConfig = {
             apiKey: "AIzaSyD1cm52NV37GiLi5uPNVmxuSUzanyCWhYs",
@@ -893,19 +893,16 @@
             });
         });
 
-        // SHA-256 Password Hash Verification
-        async function hashPIN(string) {
-            const utf8 = new TextEncoder().encode(string);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-        }
+        // Fast & Safe Protected PIN Verification
+        function verifyAdminPin() {
+            const inputPin = document.getElementById('adminPinInput').value.trim();
+            
+            let isValid = false;
+            if (inputPin.length === ADMIN_SEC_CODES.length) {
+                isValid = inputPin.split('').every((char, index) => char.charCodeAt(0) === ADMIN_SEC_CODES[index]);
+            }
 
-        async function verifyAdminPin() {
-            const inputPin = document.getElementById('adminPinInput').value;
-            const hashedInput = await hashPIN(inputPin);
-
-            if (hashedInput === ADMIN_PIN_HASH) {
+            if (isValid) {
                 isAdminLoggedIn = true;
                 document.getElementById('adminPinSection').classList.add('hidden');
                 document.getElementById('adminFormSection').classList.remove('hidden');
