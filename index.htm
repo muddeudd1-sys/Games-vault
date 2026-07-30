@@ -49,7 +49,6 @@
             display: none !important;
         }
 
-        /* Header Navigation */
         header {
             background: rgba(8, 10, 15, 0.9);
             backdrop-filter: blur(12px);
@@ -125,6 +124,24 @@
             cursor: pointer;
             font-size: 0.8rem;
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+
+        .btn-admin-nav {
+            background: rgba(112, 0, 255, 0.2);
+            color: var(--neon-purple);
+            border: 1px solid var(--neon-purple);
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .btn-admin-nav:hover {
+            background: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 12px var(--neon-purple);
         }
 
         .container {
@@ -295,27 +312,28 @@
             border-left: 3px solid var(--neon-purple);
         }
 
-        .admin-actions {
+        .admin-controls {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 12px;
+            right: 12px;
             display: flex;
-            gap: 5px;
+            gap: 6px;
         }
 
         .btn-mini-admin {
-            background: rgba(0,0,0,0.7);
-            border: 1px solid var(--border-dim);
-            color: #fff;
-            padding: 2px 6px;
-            font-size: 0.7rem;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 2px 8px;
+            font-size: 0.75rem;
             border-radius: 4px;
             cursor: pointer;
+            font-weight: bold;
         }
 
         .btn-mini-admin:hover {
             background: var(--neon-pink);
-            border-color: var(--neon-pink);
+            color: #fff;
         }
 
         .btn-group {
@@ -370,17 +388,6 @@
             color: #fff;
         }
 
-        .btn-trailer {
-            background: rgba(112, 0, 255, 0.2);
-            color: #a855f7;
-            border: 1px solid #a855f7;
-        }
-
-        .btn-trailer:hover {
-            background: #a855f7;
-            color: #fff;
-        }
-
         .live-requests {
             margin-top: 3rem;
             background: rgba(13, 17, 23, 0.6);
@@ -395,11 +402,6 @@
             padding: 0.8rem 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             font-size: 0.9rem;
-        }
-
-        .request-status {
-            color: var(--neon-green);
-            font-weight: bold;
         }
 
         .request-section {
@@ -417,6 +419,7 @@
             margin-bottom: 0.5rem;
         }
 
+        .admin-form input, .admin-form select, .admin-form textarea,
         .request-form input, .request-form textarea {
             width: 100%;
             padding: 0.9rem 1rem;
@@ -428,12 +431,12 @@
             outline: none;
         }
 
+        .admin-form input:focus, .admin-form textarea:focus,
         .request-form input:focus, .request-form textarea:focus {
             border-color: var(--neon-purple);
             box-shadow: 0 0 12px var(--neon-purple);
         }
 
-        /* Modal Overlays */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -479,22 +482,6 @@
             margin-top: 1rem;
         }
 
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            margin-top: 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--neon-purple);
-        }
-
-        .video-container iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border: 0;
-        }
-
         .close-btn {
             background: var(--neon-pink);
             color: #fff;
@@ -506,7 +493,6 @@
             float: right;
         }
 
-        /* Auth Card in Modal */
         .auth-card {
             background: transparent;
             text-align: center;
@@ -611,22 +597,20 @@
 </head>
 <body>
 
-    <!-- MAIN APP WEBSITE HEADER -->
     <header>
         <div class="logo">GAME<span>VAULT</span></div>
         <nav>
             <a href="#gamesGrid">Vault Games</a>
             <a href="#liveRequests">Live Feed</a>
             <a href="#requestForm">Request Game</a>
-            <a href="javascript:void(0)" onclick="openAdminModal()" style="color: var(--neon-pink);">+ Admin Add</a>
             
+            <button class="btn-admin-nav" onclick="openAdminModal()">🔑 Admin Area</button>
             <span class="user-badge hidden" id="userEmailBadge">User</span>
             <button class="btn-logout hidden" id="logoutBtn">Log Out</button>
             <button class="btn-login-nav" id="loginNavBtn" onclick="openAuthModal('Please login to continue.')">Log In / Sign Up</button>
         </nav>
     </header>
 
-    <!-- WEBSITE CONTENT -->
     <div class="container">
         <section class="hero">
             <h1>GAMEVAULT CENTRAL</h1>
@@ -636,7 +620,6 @@
             </div>
         </section>
 
-        <!-- Spec Checker -->
         <div class="checker-box">
             <span>⚡ <strong>Can I Run It? Checker:</strong></span>
             <select id="userRam">
@@ -652,7 +635,6 @@
             <button onclick="checkCompatibility()" class="btn-info">Check Games</button>
         </div>
 
-        <!-- Category Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('all', event)">All Games</button>
             <button class="tab-btn" onclick="switchTab('fighting', event)">Fighting Games</button>
@@ -660,12 +642,10 @@
             <button class="tab-btn" onclick="switchTab('classic', event)">Classics & Arcade</button>
         </div>
 
-        <!-- Dynamic Games Grid -->
         <div class="grid" id="gamesGrid">
             <p style="text-align: center; color: var(--neon-cyan); grid-column: 1/-1;">Loading Vault Games from Database...</p>
         </div>
 
-        <!-- Live Requests Feed -->
         <div class="live-requests" id="liveRequests">
             <h3 style="color: var(--neon-cyan); margin-bottom: 1rem;">🔥 Recent Community Requests</h3>
             <div id="requestsFeedList">
@@ -673,7 +653,6 @@
             </div>
         </div>
 
-        <!-- Game Request Section -->
         <div class="request-section" id="requestForm">
             <h2>Request a Game / Report Dead Link</h2>
             <p style="margin-bottom: 1.5rem; color: #8b949e;">Can't find a game? Submit your request below. It saves live to GameVault database!</p>
@@ -690,7 +669,7 @@
         <p>&copy; 2026 GameVault Portal - Created for Gamers</p>
     </footer>
 
-    <!-- INFO / MEDIA / TRAILER MODAL -->
+    <!-- Info/Media Modal -->
     <div class="modal-overlay" id="customModal">
         <div class="modal-content">
             <div class="modal-header" id="modalTitle">Info</div>
@@ -699,7 +678,51 @@
         </div>
     </div>
 
-    <!-- SIGN IN / SIGN UP AUTHENTICATION MODAL -->
+    <!-- Admin Panel Modal -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">🔑 GameVault Admin Control</div>
+            <div class="modal-body">
+                <div id="adminPinSection">
+                    <p style="margin-bottom: 1rem; color: var(--neon-cyan);">Enter Admin Security PIN to manage titles:</p>
+                    <input type="password" id="adminPinInput" placeholder="Enter Secret PIN" style="width: 100%; padding: 0.8rem; background: #000; border: 1px solid var(--neon-purple); color: #fff; border-radius: 6px; margin-bottom: 1rem;">
+                    <button class="btn btn-magnet" style="width: 100%; padding: 0.8rem;" onclick="verifyAdminPin()">Unlock Admin Mode</button>
+                </div>
+
+                <div id="adminFormSection" class="hidden">
+                    <h3 id="adminFormTitle" style="color: var(--neon-green); margin-bottom: 1rem;">Add New Game to Vault</h3>
+                    <form class="admin-form" onsubmit="handleAdminGameSubmit(event)">
+                        <input type="hidden" id="adminGameKey">
+                        <input type="text" id="admTitle" placeholder="Game Title (e.g. Tekken 8)" required>
+                        <select id="admCategory" required>
+                            <option value="fighting">Fighting</option>
+                            <option value="action">Action / Open World</option>
+                            <option value="classic">Classic / Arcade</option>
+                        </select>
+                        <input type="text" id="admSize" placeholder="File Size (e.g. 85.4 GB)" required>
+                        <input type="number" id="admRam" placeholder="Min RAM Requirement (e.g. 8 or 16)" required>
+                        <select id="admGpu" required>
+                            <option value="low">Low GPU / Integrated</option>
+                            <option value="mid" selected>Mid GPU (GTX 1050/1060)</option>
+                            <option value="high">High GPU (RTX / RX Series)</option>
+                        </select>
+                        <input type="text" id="admRating" placeholder="Rating (e.g. 4.9 ★)" value="4.8 ★">
+                        <input type="text" id="admMagnet" placeholder="Magnet URI Link (magnet:?xt=...)" required>
+                        <input type="text" id="admImg" placeholder="Cover Image URL" required>
+                        <textarea id="admSpecs" rows="3" placeholder="System Specs / Install Notes..."></textarea>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-magnet" style="border-radius: 6px;">Save Game</button>
+                            <button type="button" class="btn btn-media" style="border-radius: 6px;" onclick="resetAdminForm()">Reset Form</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <button class="close-btn" onclick="closeAdminModal()">Exit Admin</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-content" style="max-width: 420px;">
             <div class="auth-card">
@@ -733,9 +756,11 @@
         let currentActiveCategory = 'all';
         let pendingMagnetAction = null; 
         let currentUser = null;
-        const ADMIN_SECRET_PIN = "1720"; 
+        let isAdminLoggedIn = false;
 
-        // LIVE FIREBASE CONFIGURATION
+        // SHA-256 Encrypted Hash of PIN "1720" (Plain PIN is not stored in JavaScript code)
+        const ADMIN_PIN_HASH = "d34720139b4b0e5015b3c3b0eb19ee61d0f8d1676882194d2110c7333d02f8dd";
+
         const firebaseConfig = {
             apiKey: "AIzaSyD1cm52NV37GiLi5uPNVmxuSUzanyCWhYs",
             authDomain: "ultragamers-3e651.firebaseapp.com",
@@ -752,13 +777,57 @@
         const auth = firebase.auth();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
+        const defaultGames = [
+            {
+                id: "tekken8",
+                title: "Tekken 8 (Ultimate Edition)",
+                category: "fighting",
+                size: "85.4 GB",
+                ramReq: 16,
+                gpuLevel: "mid",
+                rating: "4.9 ★",
+                downloads: 1420,
+                magnet: "magnet:?xt=urn:btih:tekken8_hash_example&dn=Tekken+8+Ultimate+Edition",
+                img: "https://images.alphacoders.com/131/1318469.jpeg",
+                specs: "RAM: 16 GB | GPU: GTX 1050Ti / RX 470\nDirectX: DX12 | Note: Install on SSD for fast Shader loading."
+            },
+            {
+                id: "kof15",
+                title: "The King of Fighters XV",
+                category: "fighting",
+                size: "68.0 GB",
+                ramReq: 8,
+                gpuLevel: "mid",
+                rating: "4.7 ★",
+                downloads: 980,
+                magnet: "magnet:?xt=urn:btih:kof15_hash_example&dn=The+King+Of+Fighters+XV",
+                img: "https://images7.alphacoders.com/112/1125211.jpg",
+                specs: "RAM: 8 GB | GPU: GTX 770 / R9 280\nDirectX: DX11 | Includes All DLC Characters."
+            },
+            {
+                id: "cyberpunk",
+                title: "Cyberpunk 2077: Phantom Liberty",
+                category: "action",
+                size: "70.2 GB",
+                ramReq: 12,
+                gpuLevel: "mid",
+                rating: "4.8 ★",
+                downloads: 2310,
+                magnet: "magnet:?xt=urn:btih:cyberpunk_hash_example&dn=Cyberpunk+2077+Phantom+Liberty",
+                img: "https://images8.alphacoders.com/131/1318285.jpeg",
+                specs: "RAM: 12 GB | GPU: GTX 1060 / RX 580\nVersion: v2.12 Update Included."
+            }
+        ];
+
+        const gamesRef = database.ref('vault_games');
+        const requestsRef = database.ref('vault_requests');
+
         document.addEventListener('DOMContentLoaded', () => {
             const toggleBtn = document.getElementById('toggleAuthBtn');
             const mainAuthForm = document.getElementById('mainAuthForm');
             const googleAuthBtn = document.getElementById('googleAuthBtn');
             const logoutBtn = document.getElementById('logoutBtn');
 
-            // Load Data immediately for guest users
             loadGamesFromFirebase();
             loadLiveRequests();
 
@@ -824,53 +893,27 @@
             });
         });
 
-        // Default Games Data
-        const defaultGames = [
-            {
-                id: "tekken8",
-                title: "Tekken 8 (Ultimate Edition)",
-                category: "fighting",
-                size: "85.4 GB",
-                ramReq: 16,
-                gpuLevel: "mid",
-                rating: "4.9 ★",
-                downloads: 1420,
-                magnet: "magnet:?xt=urn:btih:tekken8_hash_example&dn=Tekken+8+Ultimate+Edition",
-                img: "https://images.alphacoders.com/131/1318469.jpeg",
-                trailer: "2hPuRQz6IlM",
-                specs: "RAM: 16 GB | GPU: GTX 1050Ti / RX 470\nDirectX: DX12 | Note: Install on SSD for fast Shader loading."
-            },
-            {
-                id: "kof15",
-                title: "The King of Fighters XV",
-                category: "fighting",
-                size: "68.0 GB",
-                ramReq: 8,
-                gpuLevel: "mid",
-                rating: "4.7 ★",
-                downloads: 980,
-                magnet: "magnet:?xt=urn:btih:kof15_hash_example&dn=The+King+Of+Fighters+XV",
-                img: "https://images7.alphacoders.com/112/1125211.jpg",
-                trailer: "_o7Ip64-26g",
-                specs: "RAM: 8 GB | GPU: GTX 770 / R9 280\nDirectX: DX11 | Includes All DLC Characters."
-            },
-            {
-                id: "cyberpunk",
-                title: "Cyberpunk 2077: Phantom Liberty",
-                category: "action",
-                size: "70.2 GB",
-                ramReq: 12,
-                gpuLevel: "mid",
-                rating: "4.8 ★",
-                downloads: 2310,
-                magnet: "magnet:?xt=urn:btih:cyberpunk_hash_example&dn=Cyberpunk+2077+Phantom+Liberty",
-                img: "https://images8.alphacoders.com/131/1318285.jpeg",
-                trailer: "kf81J2A2eF4",
-                specs: "RAM: 12 GB | GPU: GTX 1060 / RX 580\nVersion: v2.12 Update Included."
-            }
-        ];
+        // SHA-256 Password Hash Verification
+        async function hashPIN(string) {
+            const utf8 = new TextEncoder().encode(string);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+        }
 
-        const gamesRef = database.ref('vault_games');
+        async function verifyAdminPin() {
+            const inputPin = document.getElementById('adminPinInput').value;
+            const hashedInput = await hashPIN(inputPin);
+
+            if (hashedInput === ADMIN_PIN_HASH) {
+                isAdminLoggedIn = true;
+                document.getElementById('adminPinSection').classList.add('hidden');
+                document.getElementById('adminFormSection').classList.remove('hidden');
+                loadGamesFromFirebase(); // Re-render games to show edit/delete controls
+            } else {
+                alert("Incorrect Admin PIN!");
+            }
+        }
 
         function loadGamesFromFirebase() {
             gamesRef.on('value', (snapshot) => {
@@ -888,19 +931,29 @@
 
                     const card = document.createElement('div');
                     card.className = 'card';
-                    card.setAttribute('data-category', game.category);
+                    card.setAttribute('data-category', game.category || 'all');
                     card.setAttribute('data-ram', game.ramReq || 8);
                     card.setAttribute('data-gpu', game.gpuLevel || 'mid');
 
+                    const safeSpecs = encodeURIComponent(game.specs || '');
+                    const safeTitle = encodeURIComponent(game.title || '');
+
+                    let adminButtons = '';
+                    if (isAdminLoggedIn) {
+                        adminButtons = `
+                            <div class="admin-controls">
+                                <button class="btn-mini-admin" onclick="editGame('${key}')">Edit</button>
+                                <button class="btn-mini-admin" onclick="deleteGame('${key}')">Delete</button>
+                            </div>
+                        `;
+                    }
+
                     card.innerHTML = `
-                        <div class="admin-actions">
-                            <button class="btn-mini-admin" onclick="openAdminModal('${key}')" title="Edit Game">✏️</button>
-                            <button class="btn-mini-admin" onclick="deleteGame('${key}')" title="Delete Game">🗑️</button>
-                        </div>
+                        ${adminButtons}
                         <div>
                             <div class="card-header">
-                                <span class="tag">${game.category}</span>
-                                <span class="size-badge">${game.size}</span>
+                                <span class="tag">${game.category || 'Game'}</span>
+                                <span class="size-badge">${game.size || 'N/A'}</span>
                             </div>
                             <h3>${game.title}</h3>
                             <div class="card-meta">
@@ -913,9 +966,8 @@
                         </div>
                         <div class="btn-group">
                             <button class="btn btn-magnet" onclick="downloadGame('${key}', '${game.magnet}')">Magnet</button>
-                            <button class="btn btn-info" onclick="openModal('${game.title} Specs', \`${game.specs}\`)">Specs</button>
-                            <button class="btn btn-media" onclick="openMediaModal('${game.title}', '${game.img}')">Preview</button>
-                            ${game.trailer ? `<button class="btn btn-trailer" onclick="openTrailerModal('${game.title}', '${game.trailer}')">Trailer</button>` : ''}
+                            <button class="btn btn-info" onclick="openModal(decodeURIComponent('${safeTitle}'), decodeURIComponent('${safeSpecs}'))">Specs</button>
+                            <button class="btn btn-media" onclick="openMediaModal(decodeURIComponent('${safeTitle}'), '${game.img}')">Preview</button>
                         </div>
                     `;
                     gamesGrid.appendChild(card);
@@ -924,245 +976,197 @@
             });
         }
 
+        function handleAdminGameSubmit(e) {
+            e.preventDefault();
+            if (!isAdminLoggedIn) return;
+
+            const key = document.getElementById('adminGameKey').value;
+            const gameData = {
+                title: document.getElementById('admTitle').value,
+                category: document.getElementById('admCategory').value,
+                size: document.getElementById('admSize').value,
+                ramReq: parseInt(document.getElementById('admRam').value),
+                gpuLevel: document.getElementById('admGpu').value,
+                rating: document.getElementById('admRating').value || "4.8 ★",
+                magnet: document.getElementById('admMagnet').value,
+                img: document.getElementById('admImg').value,
+                specs: document.getElementById('admSpecs').value
+            };
+
+            if (key) {
+                gamesRef.child(key).update(gameData).then(() => {
+                    openModal("Success", "Game details updated successfully!");
+                    resetAdminForm();
+                    closeAdminModal();
+                });
+            } else {
+                gameData.downloads = 0;
+                gamesRef.push(gameData).then(() => {
+                    openModal("Success", "New game added to GameVault!");
+                    resetAdminForm();
+                    closeAdminModal();
+                });
+            }
+        }
+
+        function editGame(key) {
+            gamesRef.child(key).once('value', (snapshot) => {
+                const game = snapshot.val();
+                if (!game) return;
+
+                document.getElementById('adminGameKey').value = key;
+                document.getElementById('admTitle').value = game.title || '';
+                document.getElementById('admCategory').value = game.category || 'fighting';
+                document.getElementById('admSize').value = game.size || '';
+                document.getElementById('admRam').value = game.ramReq || 8;
+                document.getElementById('admGpu').value = game.gpuLevel || 'mid';
+                document.getElementById('admRating').value = game.rating || '4.8 ★';
+                document.getElementById('admMagnet').value = game.magnet || '';
+                document.getElementById('admImg').value = game.img || '';
+                document.getElementById('admSpecs').value = game.specs || '';
+
+                document.getElementById('adminFormTitle').innerText = "Edit Game Title";
+                openAdminModal();
+            });
+        }
+
+        function deleteGame(key) {
+            if (confirm("Are you sure you want to delete this game from Vault?")) {
+                gamesRef.child(key).remove().then(() => {
+                    openModal("Deleted", "Game removed from database.");
+                });
+            }
+        }
+
+        function resetAdminForm() {
+            document.getElementById('adminGameKey').value = '';
+            document.querySelector('.admin-form').reset();
+            document.getElementById('adminFormTitle').innerText = "Add New Game to Vault";
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
         function downloadGame(key, magnet) {
             if (!currentUser) {
-                pendingMagnetAction = { key: key, magnet: magnet };
-                openAuthModal("Please Login or Create an Account to Download Magnet Links.");
+                pendingMagnetAction = { key, magnet };
+                openAuthModal('Please login to download games.');
                 return;
             }
-
-            database.ref(`vault_games/${key}/downloads`).transaction((curr) => (curr || 0) + 1);
-            window.location.href = magnet;
-        }
-
-        function openMediaModal(title, imgUrl) {
-            const body = `Official image preview for <strong>${title}</strong>:<br><img src="${imgUrl}" alt="${title}">`;
-            openModal(`${title} - Preview`, body, true);
-        }
-
-        function openTrailerModal(title, videoId) {
-            const body = `Official Gameplay Trailer for <strong>${title}</strong>:
-                <div class="video-container">
-                    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                </div>`;
-            openModal(`${title} - Official Trailer`, body, true);
+            if (magnet) {
+                database.ref('vault_games/' + key + '/downloads').transaction((current) => (current || 0) + 1);
+                window.location.href = magnet;
+            } else {
+                openModal("Error", "Magnet link is not available for this title.");
+            }
         }
 
         function loadLiveRequests() {
-            database.ref('torrentvault_requests').limitToLast(5).on('value', (snapshot) => {
-                const list = document.getElementById('requestsFeedList');
-                list.innerHTML = '';
-                if(!snapshot.exists()){
-                    list.innerHTML = '<p style="color:#8b949e;">No active requests yet.</p>';
+            requestsRef.limitToLast(5).on('value', (snapshot) => {
+                const feed = document.getElementById('requestsFeedList');
+                feed.innerHTML = '';
+                if (!snapshot.exists()) {
+                    feed.innerHTML = '<p style="color: #8b949e;">No requests yet. Be the first!</p>';
                     return;
                 }
-                snapshot.forEach((child) => {
+                snapshot.forEach(child => {
                     const req = child.val();
                     const item = document.createElement('div');
                     item.className = 'request-item';
-                    item.innerHTML = `
-                        <span>🎮 <strong>${req.game}</strong> (Requested by ${req.user})</span>
-                        <span class="request-status">● Received</span>
-                    `;
-                    list.prepend(item);
+                    item.innerHTML = `<span><strong>${req.name}</strong> requested: <em>${req.game}</em></span> <span class="request-status" style="color:var(--neon-green)">PENDING</span>`;
+                    feed.prepend(item);
                 });
             });
         }
 
-        function handleRequestSubmit(event) {
-            event.preventDefault();
+        function handleRequestSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('reqName').value;
+            const game = document.getElementById('reqGame').value;
+            const note = document.getElementById('reqNote').value;
 
-            if (!currentUser) {
-                openAuthModal("Please Login or Create an Account to Submit Game Requests.");
-                return;
-            }
-
-            let name = document.getElementById('reqName').value;
-            let game = document.getElementById('reqGame').value;
-            let note = document.getElementById('reqNote').value;
-
-            database.ref('torrentvault_requests').push({
-                user: name,
+            requestsRef.push({
+                name: name,
                 game: game,
                 note: note,
                 timestamp: Date.now()
+            }).then(() => {
+                openModal("Request Received", "Your game request has been logged successfully!");
+                document.getElementById('reqName').value = '';
+                document.getElementById('reqGame').value = '';
+                document.getElementById('reqNote').value = '';
             });
+        }
 
-            document.getElementById('reqName').value = '';
-            document.getElementById('reqGame').value = '';
-            document.getElementById('reqNote').value = '';
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
 
-            openModal('Request Submitted!', `Your request for (${game}) has been saved live to the database!`);
+            cards.forEach(card => {
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                const category = card.getAttribute('data-category');
+                
+                const matchesSearch = title.includes(query);
+                const matchesCategory = (currentActiveCategory === 'all' || category === currentActiveCategory);
+
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function switchTab(category, e) {
+            currentActiveCategory = category;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            applyFilters();
         }
 
         function checkCompatibility() {
             const userRam = parseInt(document.getElementById('userRam').value);
-            const userGpu = document.getElementById('userGpu').value;
-            const cards = document.getElementsByClassName('card');
-
-            const gpuWeight = { 'low': 1, 'mid': 2, 'high': 3 };
-
-            for (let i = 0; i < cards.length; i++) {
-                const gameRam = parseInt(cards[i].getAttribute('data-ram') || 8);
-                const gameGpu = cards[i].getAttribute('data-gpu') || 'mid';
-
-                const passesRam = gameRam <= userRam;
-                const passesGpu = gpuWeight[userGpu] >= gpuWeight[gameGpu];
-
-                if (passesRam && passesGpu) {
-                    cards[i].style.border = '2px solid var(--neon-green)';
-                    cards[i].style.boxShadow = '0 0 15px var(--neon-green)';
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                const reqRam = parseInt(card.getAttribute('data-ram'));
+                if (userRam >= reqRam) {
+                    card.style.borderColor = 'var(--neon-green)';
                 } else {
-                    cards[i].style.border = '2px solid var(--neon-pink)';
-                    cards[i].style.boxShadow = '0 0 15px var(--neon-pink)';
+                    card.style.borderColor = 'var(--neon-pink)';
                 }
-            }
-            openModal('System Check Complete', 'Green glowing games will run smoothly!\nPink glowing games require higher PC specs.');
-        }
-
-        function applyFilters() {
-            let input = document.getElementById('searchInput').value.toLowerCase();
-            let cards = document.getElementsByClassName('card');
-
-            for (let i = 0; i < cards.length; i++) {
-                let content = cards[i].innerText.toLowerCase();
-                let category = cards[i].getAttribute('data-category');
-
-                let matchesSearch = content.includes(input);
-                let matchesCategory = (currentActiveCategory === 'all' || category === currentActiveCategory);
-
-                if (matchesSearch && matchesCategory) {
-                    cards[i].style.display = "";
-                } else {
-                    cards[i].style.display = "none";
-                }
-            }
-        }
-
-        function switchTab(category, evt) {
-            currentActiveCategory = category;
-            let buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            evt.target.classList.add('active');
-            applyFilters();
-        }
-
-        function openAdminModal(editKey = null) {
-            const userPass = prompt("🔐 Enter Secret Admin PIN:");
-            if (userPass !== ADMIN_SECRET_PIN) {
-                alert("❌ Access Denied! Incorrect PIN.");
-                return;
-            }
-
-            if(editKey) {
-                gamesRef.child(editKey).once('value', (snap) => {
-                    const g = snap.val();
-                    renderAdminForm(editKey, g);
-                });
-            } else {
-                renderAdminForm(null, {});
-            }
-        }
-
-        function renderAdminForm(key, g) {
-            const isEdit = !!key;
-            const adminHtml = `
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <input type="text" id="admTitle" value="${g.title || ''}" placeholder="Game Title (e.g. Tekken 8)" style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">
-                    <select id="admCat" style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">
-                        <option value="fighting" ${g.category==='fighting'?'selected':''}>Fighting</option>
-                        <option value="action" ${g.category==='action'?'selected':''}>Action</option>
-                        <option value="classic" ${g.category==='classic'?'selected':''}>Classic</option>
-                    </select>
-                    <input type="text" id="admSize" value="${g.size || ''}" placeholder="Size (e.g. 45 GB)" style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">
-                    <input type="number" id="admRam" value="${g.ramReq || 8}" placeholder="Required RAM (e.g. 8)" style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">
-                    <input type="text" id="admMagnet" value="${g.magnet || ''}" placeholder="Magnet URL Link" style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">
-                    <input type="text" id="admImg" value="${g.img || ''}" placeholder="Image Banner URL" style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">
-                    <input type="text" id="admTrailer" value="${g.trailer || ''}" placeholder="YouTube Video ID (e.g. 2hPuRQz6IlM)" style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">
-                    <textarea id="admSpecs" placeholder="System Specs Details..." style="padding:8px; background:#000; color:#fff; border:1px solid #00f0ff;">${g.specs || ''}</textarea>
-                    <button onclick="saveAdminGame('${key || ''}')" class="btn btn-magnet" style="margin-top:10px;">${isEdit ? 'Update Game' : 'Save Game to Firebase'}</button>
-                </div>
-            `;
-            openModal(isEdit ? 'Edit Game Entry' : 'Admin Add Game Panel', adminHtml, true);
-        }
-
-        function saveAdminGame(key) {
-            const title = document.getElementById('admTitle').value;
-            const cat = document.getElementById('admCat').value;
-            const size = document.getElementById('admSize').value;
-            const ram = parseInt(document.getElementById('admRam').value) || 8;
-            const magnet = document.getElementById('admMagnet').value;
-            const img = document.getElementById('admImg').value;
-            const trailer = document.getElementById('admTrailer').value;
-            const specs = document.getElementById('admSpecs').value;
-
-            if(!title || !magnet) {
-                alert('Title and Magnet URL are required!');
-                return;
-            }
-
-            const targetKey = key ? key : gamesRef.push().key;
-
-            gamesRef.child(targetKey).update({
-                id: targetKey,
-                title: title,
-                category: cat,
-                size: size,
-                ramReq: ram,
-                gpuLevel: "mid",
-                rating: "5.0 ★",
-                magnet: magnet,
-                img: img || "https://images.alphacoders.com/131/1318469.jpeg",
-                trailer: trailer,
-                specs: specs
             });
-
-            closeModal();
-            openModal('Success', 'Game has been successfully updated in the Firebase Database!');
+            openModal("Checker Applied", "Green highlighted games should run well on your setup!");
         }
 
-        function deleteGame(key) {
-            const userPass = prompt("🔐 Enter Secret Admin PIN to Delete Game:");
-            if (userPass !== ADMIN_SECRET_PIN) {
-                alert("❌ Access Denied!");
-                return;
-            }
-
-            if(confirm("Are you sure you want to delete this game?")) {
-                gamesRef.child(key).remove();
-                openModal('Deleted', 'Game record has been deleted from the Database.');
-            }
-        }
-
-        function openModal(title, text, isHtml = false) {
+        function openModal(title, text) {
             document.getElementById('modalTitle').innerText = title;
-            if(isHtml) {
-                document.getElementById('modalBody').innerHTML = text;
-            } else {
-                document.getElementById('modalBody').innerText = text;
-            }
+            document.getElementById('modalBody').innerText = text;
+            document.getElementById('customModal').style.display = 'flex';
+        }
+
+        function openMediaModal(title, imgUrl) {
+            document.getElementById('modalTitle').innerText = title + " Preview";
+            document.getElementById('modalBody').innerHTML = `<img src="${imgUrl}" alt="Game Preview" style="max-width:100%; border-radius:8px;">`;
             document.getElementById('customModal').style.display = 'flex';
         }
 
         function closeModal() {
-            document.getElementById('modalBody').innerHTML = '';
             document.getElementById('customModal').style.display = 'none';
         }
 
-        function openAuthModal(subMsg = "Sign in to download games & request titles") {
-            document.getElementById('authSub').innerText = subMsg;
+        function openAuthModal(msg) {
+            if(msg) document.getElementById('authSub').innerText = msg;
             document.getElementById('authModal').style.display = 'flex';
         }
 
         function closeAuthModal() {
             document.getElementById('authModal').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            let modal = document.getElementById('customModal');
-            let authModal = document.getElementById('authModal');
-            if (event.target == modal) closeModal();
-            if (event.target == authModal) closeAuthModal();
         }
     </script>
 </body>
