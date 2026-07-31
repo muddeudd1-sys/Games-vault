@@ -227,7 +227,7 @@
         }
         .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
         .card:hover .card-img-wrapper img { transform: scale(1.05); }
-        .card h3 { color: #fff; font-size: 1.2rem; margin-bottom: 0.3rem; line-height: 1.4; }
+        .card h3 { color: #fff; font-size: 1.1rem; margin-bottom: 0.3rem; line-height: 1.4; }
         .card-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--neon-pink); margin-bottom: 0.8rem; font-weight: 600; }
         .specs {
             font-size: 0.85rem; color: #8b949e; margin-bottom: 1.2rem; background: rgba(0,0,0,0.4);
@@ -474,42 +474,31 @@
         const auth = firebase.auth();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
+        // FULL EXPANDED GAMES LIST RESTORED
         const defaultGames = [
             {
-                title: "Black Myth: Wukong – Digital Deluxe Edition",
+                title: "007 First Light – v1.1.0 (Denuvoless)",
                 category: "action",
-                size: "118.5 GB",
+                size: "68.5 GB",
                 ramReq: 16,
                 gpuLevel: "high",
                 rating: "4.9 ★",
-                downloads: 4210,
-                magnet: "magnet:?xt=urn:btih:wukong_hash_example&dn=Black+Myth+Wukong+Deluxe",
-                img: "https://images.alphacoders.com/137/1370211.jpeg",
-                specs: "Version: v1.0.21.23831 + 4 DLCs\nRAM: 16 GB | GPU: RTX 2060 / RX 5700 XT\nDirectX: DX12 | High performance SSD required."
+                downloads: 2150,
+                magnet: "magnet:?xt=urn:btih:007_first_light_hash",
+                img: "https://images.alphacoders.com/136/1363198.jpeg",
+                specs: "Version: v1.1.0 (Denuvoless)\nRAM: 16 GB | GPU: RTX 2070 / RX 6700\nDirectX: DX12."
             },
             {
-                title: "Red Dead Redemption 2: Ultimate Edition",
+                title: "ENTITY: THE BLACK DAY",
                 category: "action",
-                size: "119.2 GB",
-                ramReq: 12,
+                size: "45.0 GB",
+                ramReq: 8,
                 gpuLevel: "mid",
-                rating: "5.0 ★",
-                downloads: 5120,
-                magnet: "magnet:?xt=urn:btih:rdr2_hash_example&dn=Red+Dead+Redemption+2+Ultimate",
-                img: "https://images6.alphacoders.com/911/911762.jpg",
-                specs: "Build: 1491.50 + UE Unlocker + Bonus Content\nRAM: 12 GB | GPU: GTX 1060 / RX 580\nDirectX: Vulkan / DX12."
-            },
-            {
-                title: "Tekken 8 – Ultimate Edition (All DLC Unlocked)",
-                category: "fighting",
-                size: "82.4 GB",
-                ramReq: 16,
-                gpuLevel: "high",
-                rating: "4.9 ★",
-                downloads: 3890,
-                magnet: "magnet:?xt=urn:btih:tekken8_hash_example&dn=Tekken+8+Ultimate+Edition",
-                img: "https://images8.alphacoders.com/132/1328905.jpeg",
-                specs: "Version: v1.04.00 + Season Pass 1 + Eddy/Lidia\nRAM: 16 GB | GPU: RTX 2070 / RX 5700 XT\nDirectX: DX12 | Story Mode & Arcade Quest included."
+                rating: "4.7 ★",
+                downloads: 1420,
+                magnet: "magnet:?xt=urn:btih:entity_black_day_hash",
+                img: "https://images.alphacoders.com/137/1370211.jpeg",
+                specs: "Full Version\nRAM: 8 GB | GPU: GTX 1060\nDirectX: DX11."
             },
             {
                 title: "Assassin’s Creed Shadows: Premium Edition",
@@ -518,22 +507,166 @@
                 ramReq: 16,
                 gpuLevel: "high",
                 rating: "4.8 ★",
-                downloads: 2890,
-                magnet: "magnet:?xt=urn:btih:ac_shadows_hash_example&dn=Assassins+Creed+Shadows",
+                downloads: 3890,
+                magnet: "magnet:?xt=urn:btih:ac_shadows_hash",
                 img: "https://images.alphacoders.com/136/1363198.jpeg",
-                specs: "Version: v1.1.11 + All DLCs + Bonus Content\nRAM: 16 GB | GPU: RTX 3060 / RX 6700\nDirectX: DX12."
+                specs: "Version: v1.1.11 + All DLCs + 5 Bonus OSTs\nRAM: 16 GB | GPU: RTX 3060 / RX 6700\nDirectX: DX12."
             },
             {
-                title: "Forza Horizon 5 (Multiplayer Ready)",
-                category: "racing",
-                size: "135.0 GB",
+                title: "Assassin’s Creed: Black Flag Resynced",
+                category: "classic",
+                size: "24.5 GB",
+                ramReq: 8,
+                gpuLevel: "mid",
+                rating: "5.0 ★",
+                downloads: 4890,
+                magnet: "magnet:?xt=urn:btih:ac_black_flag_resynced",
+                img: "https://images6.alphacoders.com/911/911762.jpg",
+                specs: "Version: v1.0.2 + Bonus OST\nRAM: 8 GB | GPU: GTX 1050 Ti\nDirectX: DX11."
+            },
+            {
+                title: "The First Berserker: Khazan – Deluxe Edition",
+                category: "action",
+                size: "72.0 GB",
                 ramReq: 16,
                 gpuLevel: "high",
                 rating: "4.9 ★",
-                downloads: 3450,
-                magnet: "magnet:?xt=urn:btih:forza5_hash_example&dn=Forza+Horizon+5",
+                downloads: 1890,
+                magnet: "magnet:?xt=urn:btih:khazan_deluxe_hash",
+                img: "https://images8.alphacoders.com/132/1328905.jpeg",
+                specs: "Version: v565386 + 5 DLCs/Bonuses\nRAM: 16 GB | GPU: RTX 2060 Super\nDirectX: DX12."
+            },
+            {
+                title: "Halo: Campaign Evolved – Premium Edition",
+                category: "action",
+                size: "85.2 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 3200,
+                magnet: "magnet:?xt=urn:btih:halo_evolved_hash",
                 img: "https://images8.alphacoders.com/118/1183204.jpg",
-                specs: "Version: v354.221 + 10 DLCs + Online Fix\nRAM: 16 GB | GPU: RTX 2070 / RX 6600 XT\nDirectX: DX12."
+                specs: "Version: v2026.06.26.1097863 + 3 DLCs/Bonuses\nRAM: 16 GB | GPU: RTX 3070\nDirectX: DX12."
+            },
+            {
+                title: "Black Myth: Wukong – Digital Deluxe Edition",
+                category: "action",
+                size: "118.5 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 6500,
+                magnet: "magnet:?xt=urn:btih:wukong_hash",
+                img: "https://images.alphacoders.com/137/1370211.jpeg",
+                specs: "Version: v1.0.21.23831 + 4 DLCs/Bonuses\nRAM: 16 GB | GPU: RTX 2060 / RX 5700 XT\nDirectX: DX12."
+            },
+            {
+                title: "Forza Horizon 6",
+                category: "racing",
+                size: "140.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "5.0 ★",
+                downloads: 4100,
+                magnet: "magnet:?xt=urn:btih:forza6_hash",
+                img: "https://images8.alphacoders.com/118/1183204.jpg",
+                specs: "Version: v354.221 + 10 DLCs + Multiplayer\nRAM: 16 GB | GPU: RTX 3060 / RX 6700 XT\nDirectX: DX12."
+            },
+            {
+                title: "Red Dead Redemption 2: Ultimate Edition",
+                category: "action",
+                size: "119.2 GB",
+                ramReq: 12,
+                gpuLevel: "mid",
+                rating: "5.0 ★",
+                downloads: 8900,
+                magnet: "magnet:?xt=urn:btih:rdr2_hash",
+                img: "https://images6.alphacoders.com/911/911762.jpg",
+                specs: "Build: 1491.50 + UE Unlocker + Bonus Content\nRAM: 12 GB | GPU: GTX 1060 / RX 580\nDirectX: Vulkan / DX12."
+            },
+            {
+                title: "EA SPORTS FC 26",
+                category: "racing",
+                size: "55.0 GB",
+                ramReq: 12,
+                gpuLevel: "mid",
+                rating: "4.7 ★",
+                downloads: 3100,
+                magnet: "magnet:?xt=urn:btih:fc26_hash",
+                img: "https://images8.alphacoders.com/118/1183204.jpg",
+                specs: "Version: v1.5.2/v1.0.133.58379 + Offline DLCs [Monkey Repack]\nRAM: 12 GB | GPU: GTX 1660\nDirectX: DX12."
+            },
+            {
+                title: "Resident Evil Requiem: Deluxe Edition",
+                category: "classic",
+                size: "62.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 2750,
+                magnet: "magnet:?xt=urn:btih:re_requiem_hash",
+                img: "https://images.alphacoders.com/137/1370211.jpeg",
+                specs: "Build: 22277314 + 3 DLCs/Bonuses\nRAM: 16 GB | GPU: RTX 2070\nDirectX: DX12."
+            },
+            {
+                title: "The Last of Us: Part I – Digital Deluxe Edition",
+                category: "action",
+                size: "79.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.8 ★",
+                downloads: 5400,
+                magnet: "magnet:?xt=urn:btih:tlou1_hash",
+                img: "https://images6.alphacoders.com/911/911762.jpg",
+                specs: "Version: v1.1.3 + 2 DLCs + Bonus Content\nRAM: 16 GB | GPU: RTX 3060 / RX 5700 XT\nDirectX: DX12."
+            },
+            {
+                title: "Tom Clancy’s Ghost Recon: Wildlands – Definitive Edition",
+                category: "action",
+                size: "65.0 GB",
+                ramReq: 8,
+                gpuLevel: "mid",
+                rating: "4.8 ★",
+                downloads: 3800,
+                magnet: "magnet:?xt=urn:btih:ghost_recon_wildlands_hash",
+                img: "https://images.alphacoders.com/136/1363198.jpeg",
+                specs: "Build: 7799294 + 2 DLCs\nRAM: 8 GB | GPU: GTX 1060\nDirectX: DX11."
+            },
+            {
+                title: "Crimson Desert: Deluxe Edition",
+                category: "action",
+                size: "92.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 2900,
+                magnet: "magnet:?xt=urn:btih:crimson_desert_hash",
+                img: "https://images8.alphacoders.com/132/1328905.jpeg",
+                specs: "Version: v1.13.00 + 3 DLCs\nRAM: 16 GB | GPU: RTX 3070 / RX 6800\nDirectX: DX12."
+            },
+            {
+                title: "Mafia: The Old Country – Deluxe Edition",
+                category: "action",
+                size: "58.0 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 3100,
+                magnet: "magnet:?xt=urn:btih:mafia_old_country_hash",
+                img: "https://images6.alphacoders.com/911/911762.jpg",
+                specs: "Build: 20951841 + 4 DLCs\nRAM: 16 GB | GPU: RTX 2070\nDirectX: DX12."
+            },
+            {
+                title: "Tekken 8 – Ultimate Edition",
+                category: "fighting",
+                size: "82.4 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 4100,
+                magnet: "magnet:?xt=urn:btih:tekken8_hash",
+                img: "https://images8.alphacoders.com/132/1328905.jpeg",
+                specs: "Version: v1.04.00 + Season Pass 1\nRAM: 16 GB | GPU: RTX 2070\nDirectX: DX12."
             }
         ];
 
@@ -578,8 +711,8 @@
                 if (data) {
                     loadedGamesArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 } else {
-                    loadedGamesArray = [];
-                    // Seed default catalog if DB is empty
+                    // Seed full game list if Database is empty
+                    loadedGamesArray = defaultGames.map((g, index) => ({ id: 'default_' + index, ...g }));
                     if (isAdminLoggedIn) {
                         defaultGames.forEach(game => database.ref('vault_games').push(game));
                     }
@@ -714,7 +847,7 @@
             const game = loadedGamesArray.find(g => g.id === id);
             if (!game) return;
 
-            document.getElementById('adminGameKey').value = game.id;
+            document.getElementById('adminGameKey').value = game.id.startsWith('default_') ? '' : game.id;
             document.getElementById('admTitle').value = game.title;
             document.getElementById('admCategory').value = game.category;
             document.getElementById('admSize').value = game.size;
@@ -732,6 +865,10 @@
         function deleteGame(id) {
             if (!isAdminLoggedIn) return alert("Unauthorized!");
             if (confirm("Are you sure you want to delete this game from Vault Database?")) {
+                if(id.startsWith('default_')) {
+                    alert("This is a hardcoded default game. To manage it live, edit it once and save to Database!");
+                    return;
+                }
                 database.ref(`vault_games/${id}`).remove()
                     .then(() => alert("Game removed successfully!"))
                     .catch(err => alert("Permission Denied / Error: " + err.message));
@@ -826,7 +963,7 @@
 
         function escapeHtml(str) {
             if (!str) return '';
-                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
         // Initialize App
