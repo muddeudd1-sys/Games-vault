@@ -755,13 +755,19 @@
         function initDatabaseListeners() {
             database.ref('vault_games').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data) {
+                
+                // FORCE UPDATE TO 20 GAMES IF DATABASE HAS LESS ITEMS
+                if (data && Object.keys(data).length >= 20) {
                     loadedGamesArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 } else {
-                    loadedGamesArray = defaultGames.map((g, index) => ({ id: 'default_' + index, ...g }));
-                    if (isAdminLoggedIn) {
-                        defaultGames.forEach(game => database.ref('vault_games').push(game));
-                    }
+                    // Agar Database khali hai ya us me purani 16 games hain, toh ye 20 games me overwrite kar dega
+                    database.ref('vault_games').set(
+                        defaultGames.reduce((acc, game, index) => {
+                            acc['game_' + index] = game;
+                            return acc;
+                        }, {})
+                    );
+                    loadedGamesArray = defaultGames.map((g, index) => ({ id: 'game_' + index, ...g }));
                 }
                 applyFilters();
             });
@@ -899,7 +905,7 @@
             const game = loadedGamesArray.find(g => g.id === id);
             if (!game) return;
 
-            document.getElementById('adminGameKey').value = game.id.startsWith('default_') ? '' : game.id;
+            document.getElementById('adminGameKey').value = game.id;
             document.getElementById('admTitle').value = game.title;
             document.getElementById('admCategory').value = game.category;
             document.getElementById('admSize').value = game.size;
@@ -917,10 +923,6 @@
         function deleteGame(id) {
             if (!isAdminLoggedIn) return alert("Unauthorized!");
             if (confirm("Are you sure you want to delete this game from Vault Database?")) {
-                if(id.startsWith('default_')) {
-                    alert("This is a hardcoded default game. To manage it live, edit it once and save to Database!");
-                    return;
-                }
                 database.ref(`vault_games/${id}`).remove()
                     .then(() => alert("Game removed successfully!"))
                     .catch(err => alert("Permission Denied / Error: " + err.message));
