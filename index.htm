@@ -15,7 +15,7 @@
         :root {
             --bg-dark: #05070a;
             --card-bg: rgba(13, 17, 23, 0.85);
-            --neon-green: #00ff66;
+            --neon-green: #00ff88;
             --neon-cyan: #00f0ff;
             --neon-pink: #ff007f;
             --neon-purple: #7000ff;
@@ -35,7 +35,7 @@
             line-height: 1.6;
             background-image: 
                 radial-gradient(circle at 15% 15%, rgba(112, 0, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(0, 255, 102, 0.1) 0%, transparent 40%);
+                radial-gradient(circle at 85% 85%, rgba(0, 255, 136, 0.1) 0%, transparent 40%);
             background-attachment: fixed;
         }
         .hidden { display: none !important; }
@@ -52,6 +52,12 @@
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
         .logo {
             font-size: 1.8rem;
             font-weight: 900;
@@ -63,6 +69,50 @@
             color: var(--neon-green);
             text-shadow: 0 0 12px var(--neon-green);
         }
+
+        /* --- EXACT IMAGE STYLE BADGE WITH ANIMATION --- */
+        .badge-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 16px;
+            background-color: #051611;
+            border: 1px solid #005c3c;
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.05);
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #00ff88;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            animation: pulse 1.8s infinite ease-in-out;
+        }
+        .badge-text {
+            color: #00ff88;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(0, 255, 136, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+            }
+        }
+        /* ------------------------------------------- */
+
         nav { display: flex; align-items: center; gap: 1rem; }
         nav a {
             color: var(--text-main);
@@ -76,7 +126,7 @@
         }
         .user-badge {
             font-size: 0.8rem;
-            background: rgba(0, 255, 102, 0.1);
+            background: rgba(0, 255, 136, 0.1);
             border: 1px solid var(--neon-green);
             color: var(--neon-green);
             padding: 0.3rem 0.8rem;
@@ -208,7 +258,7 @@
         .card:hover {
             transform: translateY(-8px);
             border-color: var(--neon-green);
-            box-shadow: 0 10px 30px rgba(0, 255, 102, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
         }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
         .tag {
@@ -217,7 +267,7 @@
             border-radius: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            background: rgba(0, 255, 102, 0.15);
+            background: rgba(0, 255, 136, 0.15);
             color: var(--neon-green);
             border: 1px solid var(--neon-green);
         }
@@ -244,12 +294,44 @@
             flex: 1; min-width: 70px; padding: 0.5rem; border-radius: 6px; font-weight: 700; border: none;
             cursor: pointer; text-align: center; text-decoration: none; font-size: 0.8rem; transition: 0.3s;
         }
-        .btn-magnet { background: linear-gradient(135deg, var(--neon-green), #00b347); color: #000; box-shadow: 0 0 10px rgba(0, 255, 102, 0.3); }
+        .btn-magnet { background: linear-gradient(135deg, var(--neon-green), #00b347); color: #000; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
         .btn-magnet:hover { box-shadow: 0 0 20px var(--neon-green); }
         .btn-info { background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
         .btn-info:hover { background: var(--neon-cyan); color: #000; }
         .btn-media { background: rgba(255, 0, 127, 0.15); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
         .btn-media:hover { background: var(--neon-pink); color: #fff; }
+        
+        /* --- PAGINATION STYLES --- */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .page-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-dim);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .page-btn:hover:not(:disabled), .page-btn.active {
+            background: var(--neon-cyan);
+            color: #000;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        /* ------------------------- */
+
         .live-requests { margin-top: 3rem; background: rgba(13, 17, 23, 0.6); border: 1px solid var(--border-dim); padding: 1.5rem; border-radius: 12px; }
         .request-item { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
         .request-section {
@@ -301,7 +383,14 @@
 </head>
 <body>
     <header>
-        <div class="logo">GAME<span>VAULT</span></div>
+        <div class="logo-container">
+            <div class="logo">GAME<span>VAULT</span></div>
+            <!-- Dynamic Pulsing Badge -->
+            <div class="badge-container">
+                <span class="dot"></span>
+                <span class="badge-text">100% SECURE &amp; ADS-FREE</span>
+            </div>
+        </div>
         <nav>
             <a href="#gamesGrid">Vault Games</a>
             <a href="#liveRequests">Live Feed</a>
@@ -349,6 +438,9 @@
         <div class="grid" id="gamesGrid">
             <p style="text-align: center; color: var(--neon-cyan); grid-column: 1/-1;">Loading Vault Games from Database...</p>
         </div>
+
+        <!-- Dynamic Pagination Controls -->
+        <div class="pagination-container" id="paginationControls"></div>
 
         <div class="live-requests" id="liveRequests">
             <h3 style="color: var(--neon-cyan); margin-bottom: 1rem;">🔥 Recent Community Requests</h3>
@@ -457,6 +549,11 @@
         let currentUser = null;
         let isAdminLoggedIn = false;
         let loadedGamesArray = [];
+
+        // --- PAGINATION STATE ---
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let filteredGamesList = [];
 
         const firebaseConfig = {
             apiKey: "AIzaSyD1cm52NV37GiLi5uPNVmxuSUzanyCWhYs",
@@ -748,7 +845,7 @@
                 loginNavBtn.classList.remove('hidden');
                 adminNavBtn.classList.add('hidden');
             }
-            renderGames(loadedGamesArray);
+            renderGames(filteredGamesList.length > 0 ? filteredGamesList : loadedGamesArray);
         });
 
         // --- DATABASE LISTENERS ---
@@ -756,11 +853,9 @@
             database.ref('vault_games').on('value', (snapshot) => {
                 const data = snapshot.val();
                 
-                // FORCE UPDATE TO 20 GAMES IF DATABASE HAS LESS ITEMS
                 if (data && Object.keys(data).length >= 20) {
                     loadedGamesArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 } else {
-                    // Agar Database khali hai ya us me purani 16 games hain, toh ye 20 games me overwrite kar dega
                     database.ref('vault_games').set(
                         defaultGames.reduce((acc, game, index) => {
                             acc['game_' + index] = game;
@@ -789,15 +884,33 @@
             });
         }
 
-        // --- RENDER FUNCTIONS ---
+        // --- NEW FEATURE: DOWNLOAD INCREMENT ---
+        function trackDownload(id) {
+            if (!id) return;
+            database.ref(`vault_games/${id}/downloads`).transaction((currentValue) => {
+                return (currentValue || 0) + 1;
+            });
+        }
+
+        // --- RENDER FUNCTIONS (WITH PAGINATION) ---
         function renderGames(games) {
             const grid = document.getElementById('gamesGrid');
+            const paginationContainer = document.getElementById('paginationControls');
+
             if (games.length === 0) {
                 grid.innerHTML = `<p style="text-align: center; color: #8b949e; grid-column: 1/-1;">No games found matching your filters.</p>`;
+                paginationContainer.innerHTML = '';
                 return;
             }
 
-            grid.innerHTML = games.map(g => {
+            // Pagination slice calculation
+            const totalPages = Math.ceil(games.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedGames = games.slice(startIndex, startIndex + itemsPerPage);
+
+            grid.innerHTML = paginatedGames.map(g => {
                 const adminBtns = isAdminLoggedIn ? `
                     <div class="admin-controls">
                         <button class="btn-mini-admin" onclick="editGame('${g.id}')">EDIT</button>
@@ -813,7 +926,7 @@
                             <span class="size-badge">📦 ${escapeHtml(g.size)}</span>
                         </div>
                         <div class="card-img-wrapper">
-                            <img src="${escapeHtml(g.img)}" alt="${escapeHtml(g.title)}" onerror="this.src='https://via.placeholder.com/400x200?text=Game+Cover'">
+                            <img src="${escapeHtml(g.img)}" alt="${escapeHtml(g.title)}" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x200?text=Game+Cover';">
                         </div>
                         <h3>${escapeHtml(g.title)}</h3>
                         <div class="card-meta">
@@ -822,12 +935,47 @@
                         </div>
                         <div class="specs">${escapeHtml(g.specs || '')}</div>
                         <div class="btn-group">
-                            <a href="${escapeHtml(g.magnet)}" class="btn btn-magnet">🧲 MAGNET</a>
+                            <a href="${escapeHtml(g.magnet)}" class="btn btn-magnet" onclick="trackDownload('${g.id}')">🧲 MAGNET</a>
                             <button class="btn btn-info" onclick="openGameModalByIndex('${g.id}')">INFO</button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            renderPaginationControls(totalPages);
+        }
+
+        // --- NEW FEATURE: PAGINATION CONTROLS RENDER ---
+        function renderPaginationControls(totalPages) {
+            const paginationContainer = document.getElementById('paginationControls');
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let controlsHTML = `
+                <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                controlsHTML += `
+                    <button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>
+                `;
+            }
+
+            controlsHTML += `
+                <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next &raquo;</button>
+            `;
+
+            paginationContainer.innerHTML = controlsHTML;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredGamesList.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderGames(filteredGamesList);
+            document.getElementById('gamesGrid').scrollIntoView({ behavior: 'smooth' });
         }
 
         function openGameModalByIndex(id) {
@@ -838,12 +986,13 @@
 
         function applyFilters() {
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = loadedGamesArray.filter(g => {
+            filteredGamesList = loadedGamesArray.filter(g => {
                 const matchesTab = currentActiveCategory === 'all' || g.category === currentActiveCategory;
                 const matchesSearch = g.title.toLowerCase().includes(search) || g.category.toLowerCase().includes(search);
                 return matchesTab && matchesSearch;
             });
-            renderGames(filtered);
+            currentPage = 1; // Reset to page 1 on search/filter update
+            renderGames(filteredGamesList);
         }
 
         function switchTab(cat, event) {
