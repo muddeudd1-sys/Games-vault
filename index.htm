@@ -287,6 +287,26 @@
             font-weight: bold;
         }
 
+        .card-img-wrapper {
+            width: 100%;
+            height: 180px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .card:hover .card-img-wrapper img {
+            transform: scale(1.05);
+        }
+
         .card h3 {
             color: #fff;
             font-size: 1.2rem;
@@ -311,6 +331,7 @@
             padding: 0.6rem;
             border-radius: 6px;
             border-left: 3px solid var(--neon-purple);
+            white-space: pre-line;
         }
 
         .admin-controls {
@@ -319,17 +340,19 @@
             right: 12px;
             display: flex;
             gap: 6px;
+            z-index: 10;
         }
 
         .btn-mini-admin {
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             border: 1px solid var(--neon-pink);
             color: var(--neon-pink);
-            padding: 2px 8px;
+            padding: 4px 8px;
             font-size: 0.75rem;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.2s;
         }
 
         .btn-mini-admin:hover {
@@ -607,7 +630,7 @@
             
             <button class="btn-admin-nav" onclick="openAdminModal()">🔑 Admin Area</button>
             <span class="user-badge hidden" id="userEmailBadge">User</span>
-            <button class="btn-logout hidden" id="logoutBtn">Log Out</button>
+            <button class="btn-logout hidden" id="logoutBtn" onclick="handleLogout()">Log Out</button>
             <button class="btn-login-nav" id="loginNavBtn" onclick="openAuthModal('Please login to continue.')">Log In / Sign Up</button>
         </nav>
     </header>
@@ -732,7 +755,7 @@
                 <h2 id="authTitle">GAMEVAULT</h2>
                 <p class="sub" id="authSub">Sign in to download games & request titles</p>
                 
-                <form class="auth-form" id="mainAuthForm">
+                <form class="auth-form" id="mainAuthForm" onsubmit="handleAuthSubmit(event)">
                     <input type="email" id="authEmail" placeholder="Email Address" required>
                     <input type="password" id="authPassword" placeholder="Password (min 6 chars)" required>
                     <button type="submit" class="btn-auth" id="authSubmitBtn">Login to Vault</button>
@@ -740,14 +763,14 @@
 
                 <div class="auth-divider">OR</div>
 
-                <button class="btn-google" id="googleAuthBtn">
+                <button class="btn-google" id="googleAuthBtn" onclick="handleGoogleAuth()">
                     <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.26v3.15C3.25 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.26C.46 8.23 0 10.06 0 12s.46 3.77 1.26 5.39l4.02-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.26 6.61l4.02 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/></svg>
                     Sign in with Google
                 </button>
 
                 <div class="toggle-auth">
                     <span id="toggleText">Don't have an account?</span> 
-                    <a href="javascript:void(0)" id="toggleAuthBtn">Sign Up</a>
+                    <a href="javascript:void(0)" id="toggleAuthBtn" onclick="toggleAuthMode()">Sign Up</a>
                 </div>
             </div>
             <button class="close-btn" style="margin-top: 15px; width: 100%;" onclick="closeAuthModal()">Close</button>
@@ -760,6 +783,7 @@
         let pendingMagnetAction = null; 
         let currentUser = null;
         let isAdminLoggedIn = false;
+        let loadedGamesArray = [];
 
         // SHA-256 Encrypted Hash of PIN "1720"
         const ADMIN_PIN_HASH = "d34720139b4b0e5015b3c3b0eb19ee61d0f8d1676882194d2110c7333d02f8dd";
@@ -780,7 +804,7 @@
         const auth = firebase.auth();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-        // Extended List with all requested AAA titles
+        // Extended Master Default Catalog
         const defaultGames = [
             {
                 id: "wukong",
@@ -793,7 +817,7 @@
                 downloads: 4210,
                 magnet: "magnet:?xt=urn:btih:wukong_hash_example&dn=Black+Myth+Wukong+Deluxe",
                 img: "https://images.alphacoders.com/137/1370211.jpeg",
-                specs: "Version: v1.0.21.23831 + 4 DLCs/Bonuses\nRAM: 16 GB | GPU: RTX 2060 / RX 5700 XT\nDirectX: DX12 | Note: High performance SSD recommended."
+                specs: "Version: v1.0.21.23831 + 4 DLCs\nRAM: 16 GB | GPU: RTX 2060 / RX 5700 XT\nDirectX: DX12 | High performance SSD required."
             },
             {
                 id: "rdr2",
@@ -809,6 +833,19 @@
                 specs: "Build: 1491.50 + UE Unlocker + Bonus Content\nRAM: 12 GB | GPU: GTX 1060 / RX 580\nDirectX: Vulkan / DX12."
             },
             {
+                id: "tekken8",
+                title: "Tekken 8 – Ultimate Edition (All DLC Unlocked)",
+                category: "fighting",
+                size: "82.4 GB",
+                ramReq: 16,
+                gpuLevel: "high",
+                rating: "4.9 ★",
+                downloads: 3890,
+                magnet: "magnet:?xt=urn:btih:tekken8_hash_example&dn=Tekken+8+Ultimate+Edition",
+                img: "https://images8.alphacoders.com/132/1328905.jpeg",
+                specs: "Version: v1.04.00 + Season Pass 1 + Eddy/Lidia\nRAM: 16 GB | GPU: RTX 2070 / RX 5700 XT\nDirectX: DX12 | Story Mode & Arcade Quest included."
+            },
+            {
                 id: "ac_shadows",
                 title: "Assassin’s Creed Shadows: Premium Edition",
                 category: "action",
@@ -819,7 +856,7 @@
                 downloads: 2890,
                 magnet: "magnet:?xt=urn:btih:ac_shadows_hash_example&dn=Assassins+Creed+Shadows",
                 img: "https://images.alphacoders.com/136/1363198.jpeg",
-                specs: "Version: v1.1.11 + All DLCs + 5 Bonus OSTs\nRAM: 16 GB | GPU: RTX 3060 / RX 6700\nDirectX: DX12."
+                specs: "Version: v1.1.11 + All DLCs + Bonus Content\nRAM: 16 GB | GPU: RTX 3060 / RX 6700\nDirectX: DX12."
             },
             {
                 id: "forza6",
@@ -832,7 +869,7 @@
                 downloads: 3450,
                 magnet: "magnet:?xt=urn:btih:forza6_hash_example&dn=Forza+Horizon+6",
                 img: "https://images8.alphacoders.com/118/1183204.jpg",
-                specs: "Version: v354.221 + 10 DLCs + Multiplayer Crack\nRAM: 16 GB | GPU: RTX 2070 / RX 6600 XT\nDirectX: DX12."
+                specs: "Version: v354.221 + 10 DLCs + Online Fix\nRAM: 16 GB | GPU: RTX 2070 / RX 6600 XT\nDirectX: DX12."
             },
             {
                 id: "ea_fc26",
@@ -845,7 +882,7 @@
                 downloads: 1980,
                 magnet: "magnet:?xt=urn:btih:eafc26_hash_example&dn=EA+SPORTS+FC+26",
                 img: "https://images.alphacoders.com/132/1321456.jpeg",
-                specs: "Version: v1.5.2 / v1.0.133.58379 [Monkey Repack]\nRAM: 8 GB | GPU: GTX 1050 Ti / RX 560\nDirectX: DX12."
+                specs: "Version: v1.5.2 / v1.0.133 [Monkey Repack]\nRAM: 8 GB | GPU: GTX 1050 Ti / RX 560\nDirectX: DX12."
             },
             {
                 id: "tlou1",
@@ -858,7 +895,7 @@
                 downloads: 3870,
                 magnet: "magnet:?xt=urn:btih:tlou1_hash_example&dn=The+Last+of+Us+Part+I",
                 img: "https://images7.alphacoders.com/124/1240125.jpg",
-                specs: "Version: v1.1.3 + 2 DLCs + Bonus Content\nRAM: 16 GB | GPU: RTX 3060 / RX 5700 XT\nDirectX: DX12."
+                specs: "Version: v1.1.3 + Left Behind DLC\nRAM: 16 GB | GPU: RTX 3060 / RX 5700 XT\nDirectX: DX12."
             },
             {
                 id: "re_requiem",
@@ -871,7 +908,7 @@
                 downloads: 2110,
                 magnet: "magnet:?xt=urn:btih:rerequiem_hash_example&dn=Resident+Evil+Requiem",
                 img: "https://images.alphacoders.com/130/1301290.jpg",
-                specs: "Build: 22277314 + 3 DLCs/Bonuses\nRAM: 12 GB | GPU: GTX 1070 / RX 590\nDirectX: DX12."
+                specs: "Build: 22277314 + 3 Bonus DLCs\nRAM: 12 GB | GPU: GTX 1070 / RX 590\nDirectX: DX12."
             },
             {
                 id: "crimson_desert",
@@ -884,449 +921,441 @@
                 downloads: 1620,
                 magnet: "magnet:?xt=urn:btih:crimsondesert_hash_example&dn=Crimson+Desert",
                 img: "https://images6.alphacoders.com/112/1120015.jpg",
-                specs: "Version: v1.13.00 + 3 DLCs\nRAM: 16 GB | GPU: RTX 2070 / RX 6700 XT\nDirectX: DX12."
+                specs: "Version: v1.13.00 + Pre-order Bonuses\nRAM: 16 GB | GPU: RTX 2080 / RX 6700 XT\nDirectX: DX12."
             },
             {
-                id: "mafia_old_country",
-                title: "Mafia: The Old Country – Deluxe Edition",
-                category: "action",
-                size: "65.4 GB",
-                ramReq: 12,
-                gpuLevel: "mid",
+                id: "mk1",
+                title: "Mortal Kombat 1 – Kollector's Edition",
+                category: "fighting",
+                size: "114.2 GB",
+                ramReq: 16,
+                gpuLevel: "high",
                 rating: "4.8 ★",
-                downloads: 1430,
-                magnet: "magnet:?xt=urn:btih:mafia_oldcountry_hash_example&dn=Mafia+The+Old+Country",
-                img: "https://images.alphacoders.com/137/1374520.jpeg",
-                specs: "Build: 20951841 + 4 DLCs\nRAM: 12 GB | GPU: GTX 1080 / RX 5700\nDirectX: DX12."
+                downloads: 4120,
+                magnet: "magnet:?xt=urn:btih:mk1_hash_example&dn=Mortal+Kombat+1",
+                img: "https://images3.alphacoders.com/131/1318047.jpeg",
+                specs: "Kombat Pack 1 & 2 + Shang Tsung DLC Included\nRAM: 16 GB | GPU: GTX 1080 Ti / RX 5700\nDirectX: DX12."
             },
             {
-                id: "halo_campaign",
-                title: "Halo: Campaign Evolved – Premium Edition",
-                category: "action",
+                id: "sf6",
+                title: "Street Fighter 6 – Years 1 & 2 Ultimate Pass",
+                category: "fighting",
                 size: "58.0 GB",
                 ramReq: 8,
                 gpuLevel: "mid",
                 rating: "4.8 ★",
-                downloads: 2250,
-                magnet: "magnet:?xt=urn:btih:haloevolved_hash_example&dn=Halo+Campaign+Evolved",
-                img: "https://images.alphacoders.com/112/1123490.jpg",
-                specs: "Version: v2026.06.26.1097863 + 3 DLCs/Bonuses\nRAM: 8 GB | GPU: GTX 1060 / RX 580\nDirectX: DX12."
-            },
-            {
-                id: "007_first_light",
-                title: "007 First Light (Denuvoless)",
-                category: "classic",
-                size: "48.5 GB",
-                ramReq: 8,
-                gpuLevel: "mid",
-                rating: "4.6 ★",
-                downloads: 1740,
-                magnet: "magnet:?xt=urn:btih:007_firstlight_hash_example&dn=007+First+Light",
-                img: "https://images4.alphacoders.com/111/1114532.jpg",
-                specs: "Version: v1.1.0 (Denuvoless ENTITY: THE BLACK DAY)\nRAM: 8 GB | GPU: GTX 970 / RX 470\nDirectX: DX11/DX12."
-            },
-            {
-                id: "ac_blackflag",
-                title: "Assassin’s Creed: Black Flag Resynced",
-                category: "classic",
-                size: "24.0 GB",
-                ramReq: 8,
-                gpuLevel: "low",
-                rating: "4.9 ★",
-                downloads: 4100,
-                magnet: "magnet:?xt=urn:btih:ac_blackflag_hash_example&dn=AC+Black+Flag+Resynced",
-                img: "https://images3.alphacoders.com/542/542385.jpg",
-                specs: "Version: v1.0.2 + Bonus OST\nRAM: 8 GB | GPU: GTX 760 / HD 7870\nDirectX: DX11."
-            },
-            {
-                id: "khazan",
-                title: "The First Berserker: Khazan – Deluxe Edition",
-                category: "action",
-                size: "45.0 GB",
-                ramReq: 12,
-                gpuLevel: "mid",
-                rating: "4.7 ★",
-                downloads: 1290,
-                magnet: "magnet:?xt=urn:btih:khazan_hash_example&dn=First+Berserker+Khazan",
-                img: "https://images.alphacoders.com/135/1352109.jpeg",
-                specs: "Version: v565386 + 5 DLCs/Bonuses\nRAM: 12 GB | GPU: GTX 1060 / RX 590\nDirectX: DX12."
-            },
-            {
-                id: "ghost_recon_wildlands",
-                title: "Tom Clancy’s Ghost Recon: Wildlands",
-                category: "classic",
-                size: "61.0 GB",
-                ramReq: 8,
-                gpuLevel: "mid",
-                rating: "4.7 ★",
-                downloads: 3120,
-                magnet: "magnet:?xt=urn:btih:wildlands_hash_example&dn=Ghost+Recon+Wildlands",
-                img: "https://images.alphacoders.com/812/812351.jpg",
-                specs: "Definitive Edition, Build 7799294 + 2 DLCs\nRAM: 8 GB | GPU: GTX 1060 / RX 480\nDirectX: DX11."
-            },
-            {
-                id: "tekken8",
-                title: "Tekken 8 (Ultimate Edition)",
-                category: "fighting",
-                size: "85.4 GB",
-                ramReq: 16,
-                gpuLevel: "mid",
-                rating: "4.9 ★",
-                downloads: 4890,
-                magnet: "magnet:?xt=urn:btih:tekken8_hash_example&dn=Tekken+8+Ultimate+Edition",
-                img: "https://images.alphacoders.com/131/1318469.jpeg",
-                specs: "RAM: 16 GB | GPU: GTX 1050Ti / RX 470\nDirectX: DX12 | Note: Install on SSD for fast Shader loading."
+                downloads: 2950,
+                magnet: "magnet:?xt=urn:btih:sf6_hash_example&dn=Street+Fighter+6",
+                img: "https://images7.alphacoders.com/124/1248031.jpg",
+                specs: "Version: v1.0400 + Akuma / Rashid / A.K.I. / Ed\nRAM: 8 GB | GPU: GTX 1060 / RX 580\nDirectX: DX12."
             }
         ];
 
-        const gamesRef = database.ref('vault_games');
-        const requestsRef = database.ref('vault_requests');
+        // Core App Initialization & Auth Sync
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            const badge = document.getElementById("userEmailBadge");
+            const logoutBtn = document.getElementById("logoutBtn");
+            const loginBtn = document.getElementById("loginNavBtn");
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('toggleAuthBtn');
-            const mainAuthForm = document.getElementById('mainAuthForm');
-            const googleAuthBtn = document.getElementById('googleAuthBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
+            if (user) {
+                badge.innerText = user.email || "Gamer";
+                badge.classList.remove("hidden");
+                logoutBtn.classList.remove("hidden");
+                loginBtn.classList.add("hidden");
+                closeAuthModal();
 
-            loadGamesFromFirebase();
-            loadLiveRequests();
-
-            toggleBtn.addEventListener('click', () => {
-                isSignUpMode = !isSignUpMode;
-                document.getElementById('authTitle').innerText = isSignUpMode ? "CREATE ACCOUNT" : "GAMEVAULT";
-                document.getElementById('authSub').innerText = isSignUpMode ? "Join GameVault community today" : "Sign in to download games & request titles";
-                document.getElementById('authSubmitBtn').innerText = isSignUpMode ? "Register Account" : "Login to Vault";
-                document.getElementById('toggleText').innerText = isSignUpMode ? "Already have an account?" : "Don't have an account?";
-                toggleBtn.innerText = isSignUpMode ? "Login" : "Sign Up";
-            });
-
-            mainAuthForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const email = document.getElementById('authEmail').value;
-                const password = document.getElementById('authPassword').value;
-
-                if (isSignUpMode) {
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .then(() => {
-                            closeAuthModal();
-                            openModal("Account Created!", "Your account has been created and you are now logged in.");
-                        })
-                        .catch(err => openModal("Error", err.message));
-                } else {
-                    auth.signInWithEmailAndPassword(email, password)
-                        .then(() => closeAuthModal())
-                        .catch(err => openModal("Login Error", err.message));
+                if (pendingMagnetAction) {
+                    executeMagnetDownload(pendingMagnetAction.magnet, pendingMagnetAction.key);
+                    pendingMagnetAction = null;
                 }
-            });
-
-            googleAuthBtn.addEventListener('click', () => {
-                auth.signInWithPopup(googleProvider)
-                    .then(() => closeAuthModal())
-                    .catch(err => openModal("Google Auth Error", err.message));
-            });
-
-            logoutBtn.addEventListener('click', () => {
-                auth.signOut().then(() => openModal("Logged Out", "You have been successfully logged out."));
-            });
-
-            auth.onAuthStateChanged((user) => {
-                currentUser = user;
-                const userBadge = document.getElementById('userEmailBadge');
-                const logoutBtn = document.getElementById('logoutBtn');
-                const loginNavBtn = document.getElementById('loginNavBtn');
-
-                if (user) {
-                    userBadge.classList.remove('hidden');
-                    logoutBtn.classList.remove('hidden');
-                    loginNavBtn.classList.add('hidden');
-                    userBadge.innerText = user.email ? user.email.split('@')[0] : "Gamer";
-
-                    if (pendingMagnetAction) {
-                        downloadGame(pendingMagnetAction.key, pendingMagnetAction.magnet);
-                        pendingMagnetAction = null;
-                    }
-                } else {
-                    userBadge.classList.add('hidden');
-                    logoutBtn.classList.add('hidden');
-                    loginNavBtn.classList.remove('hidden');
-                }
-            });
+            } else {
+                badge.classList.add("hidden");
+                logoutBtn.classList.add("hidden");
+                loginBtn.classList.remove("hidden");
+            }
         });
 
-        // SHA-256 Password Hash Verification
-        async function hashPIN(string) {
-            const utf8 = new TextEncoder().encode(string);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-        }
+        // Initialize Realtime Listeners
+        window.addEventListener("DOMContentLoaded", () => {
+            listenToRealtimeGames();
+            listenToRealtimeRequests();
+        });
 
-        async function verifyAdminPin() {
-            const inputPin = document.getElementById('adminPinInput').value;
-            const hashedInput = await hashPIN(inputPin);
-
-            if (hashedInput === ADMIN_PIN_HASH) {
-                isAdminLoggedIn = true;
-                document.getElementById('adminPinSection').classList.add('hidden');
-                document.getElementById('adminFormSection').classList.remove('hidden');
-                loadGamesFromFirebase();
-            } else {
-                alert("Incorrect Admin PIN!");
-            }
-        }
-
-        function loadGamesFromFirebase() {
-            gamesRef.on('value', (snapshot) => {
-                const gamesGrid = document.getElementById('gamesGrid');
-                gamesGrid.innerHTML = '';
-                
-                if (!snapshot.exists()) {
-                    defaultGames.forEach(g => gamesRef.child(g.id).set(g));
+        // Sync Games with Firebase Database
+        function listenToRealtimeGames() {
+            const gamesRef = database.ref("games");
+            gamesRef.on("value", (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    // Seed initial data if DB node is empty
+                    seedDefaultGames();
                     return;
                 }
 
-                snapshot.forEach((childSnapshot) => {
-                    const game = childSnapshot.val();
-                    const key = childSnapshot.key;
+                loadedGamesArray = [];
+                for (let key in data) {
+                    loadedGamesArray.push({
+                        key: key,
+                        ...data[key]
+                    });
+                }
+                renderGamesGrid(loadedGamesArray);
+            }, (error) => {
+                console.error("Firebase read failed:", error);
+                // Fallback local render if security rules block initial read
+                renderGamesGrid(defaultGames);
+            });
+        }
 
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.setAttribute('data-category', game.category || 'all');
-                    card.setAttribute('data-ram', game.ramReq || 8);
-                    card.setAttribute('data-gpu', game.gpuLevel || 'mid');
+        function seedDefaultGames() {
+            const gamesRef = database.ref("games");
+            defaultGames.forEach((game) => {
+                gamesRef.push(game);
+            });
+        }
 
-                    const safeSpecs = encodeURIComponent(game.specs || '');
-                    const safeTitle = encodeURIComponent(game.title || '');
+        // Render Games Cards in DOM
+        function renderGamesGrid(games) {
+            const grid = document.getElementById("gamesGrid");
+            grid.innerHTML = "";
 
-                    let adminButtons = '';
-                    if (isAdminLoggedIn) {
-                        adminButtons = `
-                            <div class="admin-controls">
-                                <button class="btn-mini-admin" onclick="editGame('${key}')">Edit</button>
-                                <button class="btn-mini-admin" onclick="deleteGame('${key}')">Delete</button>
-                            </div>
-                        `;
-                    }
+            if (!games || games.length === 0) {
+                grid.innerHTML = `<p style="text-align: center; color: var(--neon-pink); grid-column: 1/-1;">No games match your selected filters!</p>`;
+                return;
+            }
 
-                    card.innerHTML = `
-                        ${adminButtons}
-                        <div>
-                            <div class="card-header">
-                                <span class="tag">${game.category || 'Game'}</span>
-                                <span class="size-badge">${game.size || 'N/A'}</span>
-                            </div>
-                            <h3>${game.title}</h3>
-                            <div class="card-meta">
-                                <span>${game.rating || '4.8 ★'}</span>
-                                <span>📥 ${game.downloads || 0} Downloads</span>
-                            </div>
-                            <div class="specs">
-                                ${(game.specs || '').replace(/\n/g, '<br>')}
-                            </div>
+            games.forEach((game) => {
+                const isMatch = checkSingleGameCompatibility(game.ramReq, game.gpuLevel);
+                const statusBadge = isMatch ? 
+                    `<span style="color: var(--neon-green); font-weight: bold; font-size: 0.8rem;">✔ Compatible</span>` : 
+                    `<span style="color: var(--neon-pink); font-weight: bold; font-size: 0.8rem;">⚠ High Specs Needed</span>`;
+
+                const adminControls = isAdminLoggedIn ? `
+                    <div class="admin-controls">
+                        <button class="btn-mini-admin" onclick="editGame('${game.key}')">Edit</button>
+                        <button class="btn-mini-admin" onclick="deleteGame('${game.key}')">Delete</button>
+                    </div>
+                ` : '';
+
+                const cardHTML = `
+                    <div class="card" data-category="${game.category}" data-ram="${game.ramReq}" data-gpu="${game.gpuLevel}">
+                        ${adminControls}
+                        <div class="card-header">
+                            <span class="tag">${game.category}</span>
+                            <span class="size-badge">📦 ${game.size}</span>
                         </div>
+                        <div class="card-img-wrapper">
+                            <img src="${game.img}" alt="${game.title}" onerror="this.src='https://via.placeholder.com/400x200/0d1117/00f0ff?text=GameVault'">
+                        </div>
+                        <h3>${game.title}</h3>
+                        <div class="card-meta">
+                            <span>⭐ ${game.rating || '4.9 ★'}</span>
+                            <span>📥 ${game.downloads || 1200} Downloads</span>
+                        </div>
+                        <div class="specs">${game.specs || 'High performance PC gaming build.'}</div>
+                        <div style="margin-bottom: 0.8rem; text-align: right;">${statusBadge}</div>
                         <div class="btn-group">
-                            <button class="btn btn-magnet" onclick="downloadGame('${key}', '${game.magnet}')">Magnet</button>
-                            <button class="btn btn-info" onclick="openModal(decodeURIComponent('${safeTitle}'), decodeURIComponent('${safeSpecs}'))">Specs</button>
-                            <button class="btn btn-media" onclick="openMediaModal(decodeURIComponent('${safeTitle}'), '${game.img}')">Preview</button>
+                            <button onclick="triggerMagnetDownload('${game.magnet}', '${game.key || ''}')" class="btn btn-magnet">📥 Magnet</button>
+                            <button onclick="openInfoModal('${game.title.replace(/'/g, "\\'")}', \`${(game.specs || '').replace(/`/g, '')}\`, '${game.img}')" class="btn btn-info">Specs</button>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML("beforeend", cardHTML);
+            });
+        }
+
+        // Live Requests Feed Listener
+        function listenToRealtimeRequests() {
+            const reqRef = database.ref("requests").limitToLast(10);
+            reqRef.on("value", (snapshot) => {
+                const feedList = document.getElementById("requestsFeedList");
+                feedList.innerHTML = "";
+                const data = snapshot.val();
+
+                if (!data) {
+                    feedList.innerHTML = `<p style="color: #8b949e;">No game requests yet. Be the first to submit!</p>`;
+                    return;
+                }
+
+                const requests = [];
+                for (let key in data) {
+                    requests.unshift(data[key]);
+                }
+
+                requests.forEach((req) => {
+                    const item = `
+                        <div class="request-item">
+                            <div>
+                                <strong style="color: var(--neon-cyan);">${escapeHTML(req.game)}</strong> 
+                                <span style="color: #8b949e;">requested by</span> 
+                                <span style="color: var(--neon-green);">${escapeHTML(req.name)}</span>
+                            </div>
+                            <div style="color: #6e7681; font-size: 0.8rem;">${req.timestamp ? new Date(req.timestamp).toLocaleDateString() : 'Recent'}</div>
                         </div>
                     `;
-                    gamesGrid.appendChild(card);
+                    feedList.insertAdjacentHTML("beforeend", item);
                 });
-                applyFilters();
             });
+        }
+
+        // Handling User Requests
+        function handleRequestSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById("reqName").value.trim();
+            const game = document.getElementById("reqGame").value.trim();
+            const note = document.getElementById("reqNote").value.trim();
+
+            if (!name || !game) return;
+
+            database.ref("requests").push({
+                name: name,
+                game: game,
+                note: note,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                openCustomModal("Request Submitted!", `Thanks ${name}! Your request for "${game}" has been registered in the live GameVault Database.`);
+                document.getElementById("reqName").value = "";
+                document.getElementById("reqGame").value = "";
+                document.getElementById("reqNote").value = "";
+            }).catch((err) => {
+                openCustomModal("Error", "Failed to submit request: " + err.message);
+            });
+        }
+
+        // Filters and Compatibility System
+        function switchTab(category, event) {
+            currentActiveCategory = category;
+            document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+            event.target.classList.add("active");
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchVal = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll("#gamesGrid .card");
+
+            cards.forEach(card => {
+                const title = card.querySelector("h3").innerText.toLowerCase();
+                const category = card.getAttribute("data-category");
+
+                const matchesSearch = title.includes(searchVal);
+                const matchesTab = (currentActiveCategory === "all" || category === currentActiveCategory);
+
+                if (matchesSearch && matchesTab) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function checkCompatibility() {
+            const userRam = parseInt(document.getElementById("userRam").value);
+            const userGpu = document.getElementById("userGpu").value;
+
+            let compatibleCount = 0;
+            loadedGamesArray.forEach(game => {
+                if (checkSingleGameCompatibility(game.ramReq, game.gpuLevel, userRam, userGpu)) {
+                    compatibleCount++;
+                }
+            });
+
+            openCustomModal("System Compatibility Results", `Your PC configuration (${userRam}GB RAM, ${userGpu.toUpperCase()} GPU) can smoothly run ${compatibleCount} out of ${loadedGamesArray.length} games available in GameVault!`);
+            renderGamesGrid(loadedGamesArray);
+        }
+
+        function checkSingleGameCompatibility(reqRam, reqGpu, userRamOverride, userGpuOverride) {
+            const userRam = userRamOverride || parseInt(document.getElementById("userRam").value);
+            const userGpu = userGpuOverride || document.getElementById("userGpu").value;
+
+            const gpuRanks = { "low": 1, "mid": 2, "high": 3 };
+            const reqGpuRank = gpuRanks[reqGpu] || 2;
+            const userGpuRank = gpuRanks[userGpu] || 2;
+
+            return (userRam >= reqRam && userGpuRank >= reqGpuRank);
+        }
+
+        // Auth Operations
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById("authEmail").value;
+            const password = document.getElementById("authPassword").value;
+
+            if (isSignUpMode) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => openCustomModal("Success", "Account created successfully! Welcome to GameVault."))
+                    .catch(err => openCustomModal("Auth Error", err.message));
+            } else {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => openCustomModal("Welcome Back", "Successfully logged in."))
+                    .catch(err => openCustomModal("Auth Error", err.message));
+            }
+        }
+
+        function handleGoogleAuth() {
+            auth.signInWithPopup(googleProvider)
+                .then(() => openCustomModal("Success", "Signed in with Google!"))
+                .catch(err => openCustomModal("Google Auth Error", err.message));
+        }
+
+        function handleLogout() {
+            auth.signOut().then(() => {
+                openCustomModal("Logged Out", "You have been signed out.");
+            });
+        }
+
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            document.getElementById("authTitle").innerText = isSignUpMode ? "JOIN GAMEVAULT" : "GAMEVAULT";
+            document.getElementById("authSub").innerText = isSignUpMode ? "Create an account to unlock torrent downloads" : "Sign in to download games & request titles";
+            document.getElementById("authSubmitBtn").innerText = isSignUpMode ? "Register Account" : "Login to Vault";
+            document.getElementById("toggleText").innerText = isSignUpMode ? "Already have an account?" : "Don't have an account?";
+            document.getElementById("toggleAuthBtn").innerText = isSignUpMode ? "Log In" : "Sign Up";
+        }
+
+        // Download Action Guard
+        function triggerMagnetDownload(magnet, gameKey) {
+            if (!currentUser) {
+                pendingMagnetAction = { magnet: magnet, key: gameKey };
+                openAuthModal("Authentication required! Please log in to initiate Magnet downloads.");
+                return;
+            }
+            executeMagnetDownload(magnet, gameKey);
+        }
+
+        function executeMagnetDownload(magnet, gameKey) {
+            if (gameKey) {
+                database.ref(`games/${gameKey}/downloads`).transaction((curr) => (curr || 0) + 1);
+            }
+            window.location.href = magnet;
+        }
+
+        // Secure Admin Panel Logic
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function verifyAdminPin() {
+            const input = document.getElementById("adminPinInput").value;
+            const hash = await sha256(input);
+
+            if (hash === ADMIN_PIN_HASH) {
+                isAdminLoggedIn = true;
+                document.getElementById("adminPinSection").classList.add("hidden");
+                document.getElementById("adminFormSection").classList.remove("hidden");
+                renderGamesGrid(loadedGamesArray);
+            } else {
+                alert("Incorrect Security PIN!");
+            }
         }
 
         function handleAdminGameSubmit(e) {
             e.preventDefault();
-            if (!isAdminLoggedIn) return;
-
-            const key = document.getElementById('adminGameKey').value;
+            const key = document.getElementById("adminGameKey").value;
             const gameData = {
-                title: document.getElementById('admTitle').value,
-                category: document.getElementById('admCategory').value,
-                size: document.getElementById('admSize').value,
-                ramReq: parseInt(document.getElementById('admRam').value),
-                gpuLevel: document.getElementById('admGpu').value,
-                rating: document.getElementById('admRating').value || "4.8 ★",
-                magnet: document.getElementById('admMagnet').value,
-                img: document.getElementById('admImg').value,
-                specs: document.getElementById('admSpecs').value
+                title: document.getElementById("admTitle").value,
+                category: document.getElementById("admCategory").value,
+                size: document.getElementById("admSize").value,
+                ramReq: parseInt(document.getElementById("admRam").value),
+                gpuLevel: document.getElementById("admGpu").value,
+                rating: document.getElementById("admRating").value,
+                magnet: document.getElementById("admMagnet").value,
+                img: document.getElementById("admImg").value,
+                specs: document.getElementById("admSpecs").value,
+                downloads: 1250
             };
 
             if (key) {
-                gamesRef.child(key).update(gameData).then(() => {
-                    openModal("Success", "Game details updated successfully!");
+                database.ref(`games/${key}`).update(gameData).then(() => {
+                    openCustomModal("Success", "Game updated successfully!");
                     resetAdminForm();
-                    closeAdminModal();
                 });
             } else {
-                gameData.downloads = 0;
-                gamesRef.push(gameData).then(() => {
-                    openModal("Success", "New game added to GameVault!");
+                database.ref("games").push(gameData).then(() => {
+                    openCustomModal("Success", "New game added to GameVault!");
                     resetAdminForm();
-                    closeAdminModal();
                 });
             }
         }
 
         function editGame(key) {
-            gamesRef.child(key).once('value', (snapshot) => {
-                const game = snapshot.val();
-                if (!game) return;
+            const game = loadedGamesArray.find(g => g.key === key);
+            if (!game) return;
 
-                document.getElementById('adminGameKey').value = key;
-                document.getElementById('admTitle').value = game.title || '';
-                document.getElementById('admCategory').value = game.category || 'action';
-                document.getElementById('admSize').value = game.size || '';
-                document.getElementById('admRam').value = game.ramReq || 8;
-                document.getElementById('admGpu').value = game.gpuLevel || 'mid';
-                document.getElementById('admRating').value = game.rating || '4.8 ★';
-                document.getElementById('admMagnet').value = game.magnet || '';
-                document.getElementById('admImg').value = game.img || '';
-                document.getElementById('admSpecs').value = game.specs || '';
+            document.getElementById("adminGameKey").value = key;
+            document.getElementById("admTitle").value = game.title;
+            document.getElementById("admCategory").value = game.category;
+            document.getElementById("admSize").value = game.size;
+            document.getElementById("admRam").value = game.ramReq;
+            document.getElementById("admGpu").value = game.gpuLevel;
+            document.getElementById("admRating").value = game.rating || "4.9 ★";
+            document.getElementById("admMagnet").value = game.magnet;
+            document.getElementById("admImg").value = game.img;
+            document.getElementById("admSpecs").value = game.specs || "";
 
-                document.getElementById('adminFormTitle').innerText = "Edit Game Title";
-                openAdminModal();
-            });
+            document.getElementById("adminFormTitle").innerText = "Edit Game Title";
+            openAdminModal();
         }
 
         function deleteGame(key) {
-            if (confirm("Are you sure you want to delete this game from Vault?")) {
-                gamesRef.child(key).remove().then(() => {
-                    openModal("Deleted", "Game removed from database.");
+            if (confirm("Are you sure you want to delete this game from GameVault?")) {
+                database.ref(`games/${key}`).remove().then(() => {
+                    openCustomModal("Deleted", "Game removed from database.");
                 });
             }
         }
 
         function resetAdminForm() {
-            document.getElementById('adminGameKey').value = '';
-            document.querySelector('.admin-form').reset();
-            document.getElementById('adminFormTitle').innerText = "Add New Game to Vault";
+            document.getElementById("adminGameKey").value = "";
+            document.querySelector(".admin-form").reset();
+            document.getElementById("adminFormTitle").innerText = "Add New Game to Vault";
         }
 
-        function openAdminModal() {
-            document.getElementById('adminModal').style.display = 'flex';
+        // Modal Controllers
+        function openCustomModal(title, body) {
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalBody").innerText = body;
+            document.getElementById("customModal").style.display = "flex";
         }
 
-        function closeAdminModal() {
-            document.getElementById('adminModal').style.display = 'none';
-        }
-
-        function downloadGame(key, magnet) {
-            if (!currentUser) {
-                pendingMagnetAction = { key, magnet };
-                openAuthModal('Please login to download games.');
-                return;
-            }
-            if (magnet) {
-                database.ref('vault_games/' + key + '/downloads').transaction((current) => (current || 0) + 1);
-                window.location.href = magnet;
-            } else {
-                openModal("Error", "Magnet link is not available for this title.");
-            }
-        }
-
-        function loadLiveRequests() {
-            requestsRef.limitToLast(5).on('value', (snapshot) => {
-                const feed = document.getElementById('requestsFeedList');
-                feed.innerHTML = '';
-                if (!snapshot.exists()) {
-                    feed.innerHTML = '<p style="color: #8b949e;">No requests yet. Be the first!</p>';
-                    return;
-                }
-                snapshot.forEach(child => {
-                    const req = child.val();
-                    const item = document.createElement('div');
-                    item.className = 'request-item';
-                    item.innerHTML = `<span><strong>${req.name}</strong> requested: <em>${req.game}</em></span> <span class="request-status" style="color:var(--neon-green)">PENDING</span>`;
-                    feed.prepend(item);
-                });
-            });
-        }
-
-        function handleRequestSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('reqName').value;
-            const game = document.getElementById('reqGame').value;
-            const note = document.getElementById('reqNote').value;
-
-            requestsRef.push({
-                name: name,
-                game: game,
-                note: note,
-                timestamp: Date.now()
-            }).then(() => {
-                openModal("Request Received", "Your game request has been logged successfully!");
-                document.getElementById('reqName').value = '';
-                document.getElementById('reqGame').value = '';
-                document.getElementById('reqNote').value = '';
-            });
-        }
-
-        function applyFilters() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('.card');
-
-            cards.forEach(card => {
-                const title = card.querySelector('h3').innerText.toLowerCase();
-                const category = card.getAttribute('data-category');
-                
-                const matchesSearch = title.includes(query);
-                const matchesCategory = (currentActiveCategory === 'all' || category === currentActiveCategory);
-
-                if (matchesSearch && matchesCategory) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        function switchTab(category, e) {
-            currentActiveCategory = category;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-            applyFilters();
-        }
-
-        function checkCompatibility() {
-            const userRam = parseInt(document.getElementById('userRam').value);
-            const cards = document.querySelectorAll('.card');
-            
-            cards.forEach(card => {
-                const reqRam = parseInt(card.getAttribute('data-ram'));
-                if (userRam >= reqRam) {
-                    card.style.borderColor = 'var(--neon-green)';
-                } else {
-                    card.style.borderColor = 'var(--neon-pink)';
-                }
-            });
-            openModal("Checker Applied", "Green highlighted games should run well on your setup!");
-        }
-
-        function openModal(title, text) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalBody').innerText = text;
-            document.getElementById('customModal').style.display = 'flex';
-        }
-
-        function openMediaModal(title, imgUrl) {
-            document.getElementById('modalTitle').innerText = title + " Preview";
-            document.getElementById('modalBody').innerHTML = `<img src="${imgUrl}" alt="Game Preview" style="max-width:100%; border-radius:8px;">`;
-            document.getElementById('customModal').style.display = 'flex';
+        function openInfoModal(title, specs, imgUrl) {
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalBody").innerHTML = `
+                <div style="margin-bottom: 1rem;">${escapeHTML(specs)}</div>
+                <img src="${imgUrl}" alt="Cover Image">
+            `;
+            document.getElementById("customModal").style.display = "flex";
         }
 
         function closeModal() {
-            document.getElementById('customModal').style.display = 'none';
+            document.getElementById("customModal").style.display = "none";
+        }
+
+        function openAdminModal() {
+            document.getElementById("adminModal").style.display = "flex";
+        }
+
+        function closeAdminModal() {
+            document.getElementById("adminModal").style.display = "none";
         }
 
         function openAuthModal(msg) {
-            if(msg) document.getElementById('authSub').innerText = msg;
-            document.getElementById('authModal').style.display = 'flex';
+            if (msg) document.getElementById("authSub").innerText = msg;
+            document.getElementById("authModal").style.display = "flex";
         }
 
         function closeAuthModal() {
-            document.getElementById('authModal').style.display = 'none';
+            document.getElementById("authModal").style.display = "none";
+        }
+
+        function escapeHTML(str) {
+            return str ? str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            ) : '';
         }
     </script>
 </body>
