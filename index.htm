@@ -103,6 +103,16 @@
             border-radius: 20px;
         }
 
+        .admin-badge {
+            font-size: 0.8rem;
+            background: rgba(255, 0, 127, 0.2);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
         .btn-logout {
             background: var(--neon-pink);
             color: #fff;
@@ -628,7 +638,8 @@
             <a href="#liveRequests">Live Feed</a>
             <a href="#requestForm">Request Game</a>
             
-            <button class="btn-admin-nav" onclick="openAdminModal()">🔑 Admin Area</button>
+            <button class="btn-admin-nav hidden" id="adminNavBtn" onclick="openAdminModal()">🔑 Manage Games</button>
+            <span class="admin-badge hidden" id="adminRoleBadge">ADMIN</span>
             <span class="user-badge hidden" id="userEmailBadge">User</span>
             <button class="btn-logout hidden" id="logoutBtn" onclick="handleLogout()">Log Out</button>
             <button class="btn-login-nav" id="loginNavBtn" onclick="openAuthModal('Please login to continue.')">Log In / Sign Up</button>
@@ -706,15 +717,9 @@
     <!-- Admin Panel Modal -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-content">
-            <div class="modal-header">🔑 GameVault Admin Control</div>
+            <div class="modal-header">🔑 GameVault Admin Control Panel</div>
             <div class="modal-body">
-                <div id="adminPinSection">
-                    <p style="margin-bottom: 1rem; color: var(--neon-cyan);">Enter Admin Security PIN to manage titles:</p>
-                    <input type="password" id="adminPinInput" placeholder="Enter Secret PIN" style="width: 100%; padding: 0.8rem; background: #000; border: 1px solid var(--neon-purple); color: #fff; border-radius: 6px; margin-bottom: 1rem;">
-                    <button class="btn btn-magnet" style="width: 100%; padding: 0.8rem;" onclick="verifyAdminPin()">Unlock Admin Mode</button>
-                </div>
-
-                <div id="adminFormSection" class="hidden">
+                <div id="adminFormSection">
                     <h3 id="adminFormTitle" style="color: var(--neon-green); margin-bottom: 1rem;">Add New Game to Vault</h3>
                     <form class="admin-form" onsubmit="handleAdminGameSubmit(event)">
                         <input type="hidden" id="adminGameKey">
@@ -778,15 +783,14 @@
     </div>
 
     <script>
+        const ADMIN_EMAIL = "muddeudd1@gmail.com";
+
         let isSignUpMode = false;
         let currentActiveCategory = 'all';
         let pendingMagnetAction = null; 
         let currentUser = null;
         let isAdminLoggedIn = false;
         let loadedGamesArray = [];
-
-        // SHA-256 Encrypted Hash of PIN "1720"
-        const ADMIN_PIN_HASH = "d34720139b4b0e5015b3c3b0eb19ee61d0f8d1676882194d2110c7333d02f8dd";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD1cm52NV37GiLi5uPNVmxuSUzanyCWhYs",
@@ -804,7 +808,6 @@
         const auth = firebase.auth();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-        // Extended Master Default Catalog
         const defaultGames = [
             {
                 id: "wukong",
@@ -951,10 +954,12 @@
             }
         ];
 
-        // Core App Initialization & Auth Sync
+        // Automatic Admin Email Verification Logic
         auth.onAuthStateChanged((user) => {
             currentUser = user;
             const badge = document.getElementById("userEmailBadge");
+            const adminBadge = document.getElementById("adminRoleBadge");
+            const adminNavBtn = document.getElementById("adminNavBtn");
             const logoutBtn = document.getElementById("logoutBtn");
             const loginBtn = document.getElementById("loginNavBtn");
 
@@ -963,6 +968,18 @@
                 badge.classList.remove("hidden");
                 logoutBtn.classList.remove("hidden");
                 loginBtn.classList.add("hidden");
+
+                // Check Admin Privilege
+                if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                    isAdminLoggedIn = true;
+                    adminBadge.classList.remove("hidden");
+                    adminNavBtn.classList.remove("hidden");
+                } else {
+                    isAdminLoggedIn = false;
+                    adminBadge.classList.add("hidden");
+                    adminNavBtn.classList.add("hidden");
+                }
+
                 closeAuthModal();
 
                 if (pendingMagnetAction) {
@@ -970,26 +987,29 @@
                     pendingMagnetAction = null;
                 }
             } else {
+                isAdminLoggedIn = false;
                 badge.classList.add("hidden");
+                adminBadge.classList.add("hidden");
+                adminNavBtn.classList.add("hidden");
                 logoutBtn.classList.add("hidden");
                 loginBtn.classList.remove("hidden");
             }
+
+            renderGamesGrid(loadedGamesArray);
         });
 
-        // Initialize Realtime Listeners
         window.addEventListener("DOMContentLoaded", () => {
             listenToRealtimeGames();
             listenToRealtimeRequests();
         });
 
-        // Sync Games with Firebase Database
         function listenToRealtimeGames() {
-            const gamesRef = database.ref("games");
+            const gamesRef = database.ref("vault_games");
             gamesRef.on("value", (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
-                    // Seed initial data if DB node is empty
-                    seedDefaultGames();
+                    if (isAdminLoggedIn) seedDefaultGames();
+                    renderGamesGrid(defaultGames);
                     return;
                 }
 
@@ -1002,26 +1022,24 @@
                 }
                 renderGamesGrid(loadedGamesArray);
             }, (error) => {
-                console.error("Firebase read failed:", error);
-                // Fallback local render if security rules block initial read
+                console.error("Firebase read fallback:", error);
                 renderGamesGrid(defaultGames);
             });
         }
 
         function seedDefaultGames() {
-            const gamesRef = database.ref("games");
+            const gamesRef = database.ref("vault_games");
             defaultGames.forEach((game) => {
                 gamesRef.push(game);
             });
         }
 
-        // Render Games Cards in DOM
         function renderGamesGrid(games) {
             const grid = document.getElementById("gamesGrid");
             grid.innerHTML = "";
 
             if (!games || games.length === 0) {
-                grid.innerHTML = `<p style="text-align: center; color: var(--neon-pink); grid-column: 1/-1;">No games match your selected filters!</p>`;
+                grid.innerHTML = `<p style="text-align: center; color: var(--neon-pink); grid-column: 1/-1;">No games found in Vault!</p>`;
                 return;
             }
 
@@ -1065,9 +1083,8 @@
             });
         }
 
-        // Live Requests Feed Listener
         function listenToRealtimeRequests() {
-            const reqRef = database.ref("requests").limitToLast(10);
+            const reqRef = database.ref("torrentvault_requests").limitToLast(10);
             reqRef.on("value", (snapshot) => {
                 const feedList = document.getElementById("requestsFeedList");
                 feedList.innerHTML = "";
@@ -1099,7 +1116,6 @@
             });
         }
 
-        // Handling User Requests
         function handleRequestSubmit(e) {
             e.preventDefault();
             const name = document.getElementById("reqName").value.trim();
@@ -1108,7 +1124,7 @@
 
             if (!name || !game) return;
 
-            database.ref("requests").push({
+            database.ref("torrentvault_requests").push({
                 name: name,
                 game: game,
                 note: note,
@@ -1123,7 +1139,6 @@
             });
         }
 
-        // Filters and Compatibility System
         function switchTab(category, event) {
             currentActiveCategory = category;
             document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
@@ -1176,7 +1191,6 @@
             return (userRam >= reqRam && userGpuRank >= reqGpuRank);
         }
 
-        // Auth Operations
         function handleAuthSubmit(e) {
             e.preventDefault();
             const email = document.getElementById("authEmail").value;
@@ -1214,7 +1228,6 @@
             document.getElementById("toggleAuthBtn").innerText = isSignUpMode ? "Log In" : "Sign Up";
         }
 
-        // Download Action Guard
         function triggerMagnetDownload(magnet, gameKey) {
             if (!currentUser) {
                 pendingMagnetAction = { magnet: magnet, key: gameKey };
@@ -1226,35 +1239,18 @@
 
         function executeMagnetDownload(magnet, gameKey) {
             if (gameKey) {
-                database.ref(`games/${gameKey}/downloads`).transaction((curr) => (curr || 0) + 1);
+                database.ref(`vault_games/${gameKey}/downloads`).transaction((curr) => (curr || 0) + 1);
             }
             window.location.href = magnet;
         }
 
-        // Secure Admin Panel Logic
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function verifyAdminPin() {
-            const input = document.getElementById("adminPinInput").value;
-            const hash = await sha256(input);
-
-            if (hash === ADMIN_PIN_HASH) {
-                isAdminLoggedIn = true;
-                document.getElementById("adminPinSection").classList.add("hidden");
-                document.getElementById("adminFormSection").classList.remove("hidden");
-                renderGamesGrid(loadedGamesArray);
-            } else {
-                alert("Incorrect Security PIN!");
-            }
-        }
-
         function handleAdminGameSubmit(e) {
             e.preventDefault();
+            if (!isAdminLoggedIn) {
+                alert("Unauthorized! Only muddeudd1@gmail.com can make changes.");
+                return;
+            }
+
             const key = document.getElementById("adminGameKey").value;
             const gameData = {
                 title: document.getElementById("admTitle").value,
@@ -1270,15 +1266,17 @@
             };
 
             if (key) {
-                database.ref(`games/${key}`).update(gameData).then(() => {
-                    openCustomModal("Success", "Game updated successfully!");
+                database.ref(`vault_games/${key}`).update(gameData).then(() => {
+                    openCustomModal("Success", "Game updated successfully in Firebase!");
                     resetAdminForm();
-                });
+                    closeAdminModal();
+                }).catch(err => openCustomModal("Permission Error", err.message));
             } else {
-                database.ref("games").push(gameData).then(() => {
+                database.ref("vault_games").push(gameData).then(() => {
                     openCustomModal("Success", "New game added to GameVault!");
                     resetAdminForm();
-                });
+                    closeAdminModal();
+                }).catch(err => openCustomModal("Permission Error", err.message));
             }
         }
 
@@ -1302,10 +1300,11 @@
         }
 
         function deleteGame(key) {
+            if (!isAdminLoggedIn) return;
             if (confirm("Are you sure you want to delete this game from GameVault?")) {
-                database.ref(`games/${key}`).remove().then(() => {
+                database.ref(`vault_games/${key}`).remove().then(() => {
                     openCustomModal("Deleted", "Game removed from database.");
-                });
+                }).catch(err => openCustomModal("Permission Error", err.message));
             }
         }
 
@@ -1315,7 +1314,6 @@
             document.getElementById("adminFormTitle").innerText = "Add New Game to Vault";
         }
 
-        // Modal Controllers
         function openCustomModal(title, body) {
             document.getElementById("modalTitle").innerText = title;
             document.getElementById("modalBody").innerText = body;
