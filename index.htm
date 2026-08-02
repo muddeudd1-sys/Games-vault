@@ -934,7 +934,7 @@
             });
         }
 
-        // --- RENDER LIVE REQUESTS FEED WITH ADMIN REPLY FEATURE ---
+        // --- RENDER LIVE REQUESTS FEED WITH DUAL KEYS MAPPING ---
         function renderRequestsFeed() {
             const feedContainer = document.getElementById('requestsFeedList');
             const adminListContainer = document.getElementById('adminRequestsList');
@@ -949,6 +949,11 @@
             // Render Public Feed (Top 5 Requests)
             const publicList = loadedRequestsArray.slice(0, 5);
             feedContainer.innerHTML = publicList.map(r => {
+                // Dual key fallback check
+                const name = r.user || r.reqName || 'Gamer';
+                const game = r.game || r.reqGame || 'No Title';
+                const note = r.note || r.reqNote || 'No details';
+
                 const replyHtml = r.adminReply ? `
                     <div class="admin-reply-badge">
                         🛡️ <strong>Admin Reply:</strong> ${escapeHtml(r.adminReply)}
@@ -965,8 +970,8 @@
                 return `
                     <div class="request-item">
                         <div class="request-header">
-                            <div><strong>${escapeHtml(r.reqGame)}</strong> - <span style="color: #8b949e;">${escapeHtml(r.reqNote || 'No details')}</span></div>
-                            <div style="color: var(--neon-green); font-size: 0.8rem;">By ${escapeHtml(r.reqName)}</div>
+                            <div><strong>${escapeHtml(game)}</strong> - <span style="color: #8b949e;">${escapeHtml(note)}</span></div>
+                            <div style="color: var(--neon-green); font-size: 0.8rem;">By ${escapeHtml(name)}</div>
                         </div>
                         ${replyHtml}
                         ${adminReplyForm}
@@ -976,19 +981,25 @@
 
             // Render Requests in Admin Panel List
             if (adminListContainer) {
-                adminListContainer.innerHTML = loadedRequestsArray.map(r => `
-                    <div class="request-item" style="border: 1px solid var(--border-dim); padding: 12px; margin-bottom: 10px; border-radius: 8px;">
-                        <div class="request-header">
-                            <div><strong style="color: var(--neon-cyan);">${escapeHtml(r.reqGame)}</strong> (Gamer: ${escapeHtml(r.reqName)})</div>
+                adminListContainer.innerHTML = loadedRequestsArray.map(r => {
+                    const name = r.user || r.reqName || 'Gamer';
+                    const game = r.game || r.reqGame || 'No Title';
+                    const note = r.note || r.reqNote || 'N/A';
+
+                    return `
+                        <div class="request-item" style="border: 1px solid var(--border-dim); padding: 12px; margin-bottom: 10px; border-radius: 8px;">
+                            <div class="request-header">
+                                <div><strong style="color: var(--neon-cyan);">${escapeHtml(game)}</strong> (Gamer: ${escapeHtml(name)})</div>
+                            </div>
+                            <div style="color: #8b949e; font-size: 0.85rem; margin-top: 4px;">Note: ${escapeHtml(note)}</div>
+                            ${r.adminReply ? `<div class="admin-reply-badge" style="margin-top:8px;">🛡️ Reply: ${escapeHtml(r.adminReply)}</div>` : ''}
+                            <div class="admin-reply-input-box">
+                                <input type="text" id="admModalReplyInput_${r.id}" placeholder="Type reply..." value="${escapeHtml(r.adminReply || '')}">
+                                <button onclick="submitAdminReply('${r.id}', 'admModalReplyInput_${r.id}')">Save Reply</button>
+                            </div>
                         </div>
-                        <div style="color: #8b949e; font-size: 0.85rem; margin-top: 4px;">Note: ${escapeHtml(r.reqNote || 'N/A')}</div>
-                        ${r.adminReply ? `<div class="admin-reply-badge" style="margin-top:8px;">🛡️ Reply: ${escapeHtml(r.adminReply)}</div>` : ''}
-                        <div class="admin-reply-input-box">
-                            <input type="text" id="admModalReplyInput_${r.id}" placeholder="Type reply..." value="${escapeHtml(r.adminReply || '')}">
-                            <button onclick="submitAdminReply('${r.id}', 'admModalReplyInput_${r.id}')">Save Reply</button>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         }
 
@@ -1159,15 +1170,26 @@
             alert(`⚡ Compatibility Checker Result:\nYour Rig can smoothly run ${playable.length} out of ${loadedGamesArray.length} games in Vault!`);
         }
 
-        // --- REQUEST SUBMISSION ---
+        // --- REQUEST SUBMISSION (WITH VALIDATION & EXACT KEYS) ---
         function handleRequestSubmit(e) {
             e.preventDefault();
-            const reqName = document.getElementById('reqName').value;
-            const reqGame = document.getElementById('reqGame').value;
-            const reqNote = document.getElementById('reqNote').value;
+            const reqName = document.getElementById('reqName').value.trim();
+            const reqGame = document.getElementById('reqGame').value.trim();
+            const reqNote = document.getElementById('reqNote').value.trim();
+
+            if (!reqName || !reqGame) {
+                alert("Please enter both your name and the game title!");
+                return;
+            }
 
             database.ref('torrentvault_requests').push({
-                reqName, reqGame, reqNote, timestamp: Date.now()
+                user: reqName,
+                game: reqGame,
+                note: reqNote,
+                reqName: reqName,
+                reqGame: reqGame,
+                reqNote: reqNote,
+                timestamp: Date.now()
             }).then(() => {
                 alert('Success! Your game request has been logged live to Vault Database.');
                 e.target.reset();
