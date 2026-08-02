@@ -333,7 +333,42 @@
         /* ------------------------- */
 
         .live-requests { margin-top: 3rem; background: rgba(13, 17, 23, 0.6); border: 1px solid var(--border-dim); padding: 1.5rem; border-radius: 12px; }
-        .request-item { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .request-item { display: flex; flex-direction: column; gap: 6px; padding: 0.8rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .request-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+        .admin-reply-badge {
+            background: rgba(112, 0, 255, 0.2);
+            border: 1px solid var(--neon-purple);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+        .admin-reply-input-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .admin-reply-input-box input {
+            flex: 1;
+            padding: 0.4rem 0.8rem;
+            background: #05070a;
+            border: 1px solid var(--neon-purple);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .admin-reply-input-box button {
+            padding: 0.4rem 0.8rem;
+            background: var(--neon-purple);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
         .request-section {
             background: var(--card-bg); border: 1px solid var(--neon-purple); padding: 2.5rem; border-radius: 16px; margin-top: 4rem; box-shadow: 0 0 25px rgba(112, 0, 255, 0.2);
         }
@@ -478,7 +513,15 @@
     <div class="modal-overlay" id="adminModal">
         <div class="modal-content">
             <div class="modal-header">🔑 GameVault Admin Control Panel</div>
+            
+            <!-- Admin Tabs -->
+            <div class="tabs" style="justify-content: flex-start; margin-bottom: 1rem;">
+                <button class="tab-btn active" id="adminTabGameBtn" onclick="switchAdminTab('games')">Manage Games</button>
+                <button class="tab-btn" id="adminTabReqBtn" onclick="switchAdminTab('requests')">Community Requests</button>
+            </div>
+
             <div class="modal-body">
+                <!-- Section 1: Games Form -->
                 <div id="adminFormSection">
                     <h3 id="adminFormTitle" style="color: var(--neon-green); margin-bottom: 1rem;">Add New Game to Vault</h3>
                     <form class="admin-form" onsubmit="handleAdminGameSubmit(event)">
@@ -507,6 +550,14 @@
                             <button type="button" class="btn btn-media" style="border-radius: 6px;" onclick="resetAdminForm()">Reset Form</button>
                         </div>
                     </form>
+                </div>
+
+                <!-- Section 2: Requests View for Admin -->
+                <div id="adminRequestsSection" class="hidden">
+                    <h3 style="color: var(--neon-cyan); margin-bottom: 1rem;">Manage &amp; Reply Requests</h3>
+                    <div id="adminRequestsList">
+                        <p style="color: #8b949e;">Loading requests...</p>
+                    </div>
                 </div>
             </div>
             <button class="close-btn" onclick="closeAdminModal()">Exit Admin</button>
@@ -549,6 +600,7 @@
         let currentUser = null;
         let isAdminLoggedIn = false;
         let loadedGamesArray = [];
+        let loadedRequestsArray = [];
 
         // --- PAGINATION STATE ---
         let currentPage = 1;
@@ -846,6 +898,7 @@
                 adminNavBtn.classList.add('hidden');
             }
             renderGames(filteredGamesList.length > 0 ? filteredGamesList : loadedGamesArray);
+            renderRequestsFeed();
         });
 
         // --- DATABASE LISTENERS ---
@@ -869,19 +922,91 @@
 
             database.ref('torrentvault_requests').on('value', (snapshot) => {
                 const data = snapshot.val();
-                const feedContainer = document.getElementById('requestsFeedList');
                 if (data) {
-                    const reqList = Object.values(data).reverse().slice(0, 5);
-                    feedContainer.innerHTML = reqList.map(r => `
-                        <div class="request-item">
+                    loadedRequestsArray = Object.keys(data).map(key => ({
+                        id: key,
+                        ...data[key]
+                    })).reverse();
+                } else {
+                    loadedRequestsArray = [];
+                }
+                renderRequestsFeed();
+            });
+        }
+
+        // --- RENDER LIVE REQUESTS FEED WITH ADMIN REPLY FEATURE ---
+        function renderRequestsFeed() {
+            const feedContainer = document.getElementById('requestsFeedList');
+            const adminListContainer = document.getElementById('adminRequestsList');
+
+            if (loadedRequestsArray.length === 0) {
+                const emptyMsg = `<p style="color: #8b949e;">No game requests submitted yet.</p>`;
+                if (feedContainer) feedContainer.innerHTML = emptyMsg;
+                if (adminListContainer) adminListContainer.innerHTML = emptyMsg;
+                return;
+            }
+
+            // Render Public Feed (Top 5 Requests)
+            const publicList = loadedRequestsArray.slice(0, 5);
+            feedContainer.innerHTML = publicList.map(r => {
+                const replyHtml = r.adminReply ? `
+                    <div class="admin-reply-badge">
+                        🛡️ <strong>Admin Reply:</strong> ${escapeHtml(r.adminReply)}
+                    </div>
+                ` : '';
+
+                const adminReplyForm = isAdminLoggedIn ? `
+                    <div class="admin-reply-input-box">
+                        <input type="text" id="replyInput_${r.id}" placeholder="Type reply for gamer..." value="${escapeHtml(r.adminReply || '')}">
+                        <button onclick="submitAdminReply('${r.id}')">${r.adminReply ? 'Update Reply' : 'Send Reply'}</button>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="request-item">
+                        <div class="request-header">
                             <div><strong>${escapeHtml(r.reqGame)}</strong> - <span style="color: #8b949e;">${escapeHtml(r.reqNote || 'No details')}</span></div>
                             <div style="color: var(--neon-green); font-size: 0.8rem;">By ${escapeHtml(r.reqName)}</div>
                         </div>
-                    `).join('');
-                } else {
-                    feedContainer.innerHTML = `<p style="color: #8b949e;">No game requests submitted yet.</p>`;
-                }
-            });
+                        ${replyHtml}
+                        ${adminReplyForm}
+                    </div>
+                `;
+            }).join('');
+
+            // Render Requests in Admin Panel List
+            if (adminListContainer) {
+                adminListContainer.innerHTML = loadedRequestsArray.map(r => `
+                    <div class="request-item" style="border: 1px solid var(--border-dim); padding: 12px; margin-bottom: 10px; border-radius: 8px;">
+                        <div class="request-header">
+                            <div><strong style="color: var(--neon-cyan);">${escapeHtml(r.reqGame)}</strong> (Gamer: ${escapeHtml(r.reqName)})</div>
+                        </div>
+                        <div style="color: #8b949e; font-size: 0.85rem; margin-top: 4px;">Note: ${escapeHtml(r.reqNote || 'N/A')}</div>
+                        ${r.adminReply ? `<div class="admin-reply-badge" style="margin-top:8px;">🛡️ Reply: ${escapeHtml(r.adminReply)}</div>` : ''}
+                        <div class="admin-reply-input-box">
+                            <input type="text" id="admModalReplyInput_${r.id}" placeholder="Type reply..." value="${escapeHtml(r.adminReply || '')}">
+                            <button onclick="submitAdminReply('${r.id}', 'admModalReplyInput_${r.id}')">Save Reply</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // --- SUBMIT ADMIN REPLY FUNCTION ---
+        function submitAdminReply(requestId, customInputId) {
+            if (!isAdminLoggedIn) return alert("Unauthorized access!");
+            
+            const inputEl = document.getElementById(customInputId || `replyInput_${requestId}`);
+            if (!inputEl) return;
+
+            const replyText = inputEl.value.trim();
+            if (!replyText) return alert("Please enter a reply message.");
+
+            database.ref(`torrentvault_requests/${requestId}/adminReply`).set(replyText)
+                .then(() => {
+                    alert("Reply saved successfully!");
+                })
+                .catch(err => alert("Error saving reply: " + err.message));
         }
 
         // --- NEW FEATURE: DOWNLOAD INCREMENT ---
@@ -1002,6 +1127,25 @@
             applyFilters();
         }
 
+        function switchAdminTab(tab) {
+            const gamesSec = document.getElementById('adminFormSection');
+            const reqsSec = document.getElementById('adminRequestsSection');
+            const gameBtn = document.getElementById('adminTabGameBtn');
+            const reqBtn = document.getElementById('adminTabReqBtn');
+
+            if (tab === 'games') {
+                gamesSec.classList.remove('hidden');
+                reqsSec.classList.add('hidden');
+                gameBtn.classList.add('active');
+                reqBtn.classList.remove('active');
+            } else {
+                gamesSec.classList.add('hidden');
+                reqsSec.classList.remove('hidden');
+                gameBtn.classList.remove('active');
+                reqBtn.classList.add('active');
+            }
+        }
+
         function checkCompatibility() {
             const ram = parseInt(document.getElementById('userRam').value);
             const gpu = document.getElementById('userGpu').value;
@@ -1036,6 +1180,7 @@
                 alert("Access Denied: You must be logged in as Admin (muddeudd1@gmail.com).");
                 return;
             }
+            switchAdminTab('games');
             document.getElementById('adminModal').style.display = 'flex';
         }
 
